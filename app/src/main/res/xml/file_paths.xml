@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <external-files-path name="security_videos" path="Movies/SecurityRecorder" />
+    <external-path name="external_storage" path="." />
+    <files-path name="internal_videos" path="videos" />
+    <cache-path name="cache_videos" path="temp" />
+    <root-path name="all_root" path="." />
+</paths>

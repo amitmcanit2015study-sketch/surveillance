@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Surveillance</string>
+    <string name="app_header_subtitle">by Amit Bharat</string>
+    <string name="developer_name">Developed by: Amit Bharat</string>
+    <string name="company_name">Company: Rooys Soft Tech</string>
+    <string name="company_email">rooyssofttech2020@gmail.com</string>
+    <string name="app_version_name">v1.0.0 (Production Build)</string>
+    <string name="about_description">Surveillance is a free, ad-free gallery and security camera manager designed for a fast, simple, and seamless experience. Easily organize, browse, and manage your recordings and files with a clean interface, smooth performance, and privacy at its core.</string>
+    <string name="header_title">Surveillance</string>
+    <string name="share_app">Share App</string>
+    <string name="share_app_description">Share Gallery with friends and family (Description &amp; APK)</string>
+
+    <!-- Navigation and Menu -->
+    <string name="menu_toggle_grid">Switch to Grid</string>
+    <string name="menu_toggle_list">Switch to List</string>
+    <string name="menu_storage">Storage Manager</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_search_hint">Search recordings (date, name)...</string>
+    <string name="filter_all">All</string>
+    <string name="filter_today">Today</string>
+    <string name="filter_this_week">This Week</string>
+    <string name="filter_this_month">This Month</string>
+    <string name="filter_favorites">Favorites</string>
+
+    <!-- Empty State -->
+    <string name="empty_gallery_title">No Recordings Found</string>
+    <string name="empty_gallery_subtitle">Tap the record button below to capture security footage.</string>
+
+    <!-- Recording Controls & HUD -->
+    <string name="start_recording">Start Recording</string>
+    <string name="stop_recording">Stop Recording</string>
+    <string name="recording_in_progress">Recording in progress</string>
+    <string name="recording_stopped">Recording saved</string>
+    <string name="storage_warning_title">Storage Low</string>
+    <string name="storage_critical_message">Storage is critically low (&lt; 100MB). Recording stopped automatically to safeguard system integrity.</string>
+    <string name="battery_warning">Battery is low (%d%%)</string>
+    <string name="camera_flip">Switch Camera</string>
+    <string name="torch_on">Flash On</string>
+    <string name="torch_off">Flash Off</string>
+    <string name="quality_title">Quality</string>
+    <string name="audio_enabled">Audio Enabled</string>
+    <string name="audio_disabled">Audio Disabled</string>
+    <string name="location_tagging">GPS Tagging</string>
+
+    <!-- Video Player -->
+    <string name="player_title">Recording Player</string>
+    <string name="player_pip">Picture-in-Picture</string>
+    <string name="player_metadata">EXIF / Info</string>
+    <string name="player_share">Share Video</string>
+    <string name="player_delete">Delete Video</string>
+    <string name="player_rename">Rename Video</string>
+    <string name="playback_speed">Playback Speed</string>
+    <string name="speed_0_5x">0.5x</string>
+    <string name="speed_1_0x">1.0x (Normal)</string>
+    <string name="speed_1_25x">1.25x</string>
+    <string name="speed_1_5x">1.5x</string>
+    <string name="speed_2_0x">2.0x</string>
+
+    <!-- Metadata Dialog -->
+    <string name="metadata_title">Video Information &amp; EXIF</string>
+    <string name="meta_filename">Filename</string>
+    <string name="meta_date">Timestamp</string>
+    <string name="meta_duration">Duration</string>
+    <string name="meta_filesize">File Size</string>
+    <string name="meta_resolution">Resolution</string>
+    <string name="meta_codec">Format / Codec</string>
+    <string name="meta_location">GPS Location</string>
+    <string name="meta_path">Path</string>
+
+    <!-- Dialogs -->
+    <string name="confirm_delete_title">Delete Recording</string>
+    <string name="confirm_delete_message">Are you sure you want to permanently delete this security recording? This action cannot be undone.</string>
+    <string name="rename_title">Rename Recording</string>
+    <string name="rename_hint">Enter new filename</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_save">Save</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Recording Settings</string>
+    <string name="settings_section_camera">Camera &amp; Video</string>
+    <string name="settings_section_security">Security &amp; Privacy</string>
+    <string name="settings_section_storage">Storage &amp; Maintenance</string>
+    <string name="settings_section_backup">Backup &amp; Restore</string>
+    <string name="settings_section_about">About</string>
+
+    <string name="pref_resolution">Video Resolution</string>
+    <string name="pref_framerate">Target Frame Rate</string>
+    <string name="pref_audio">Record Audio</string>
+    <string name="pref_location">Tag GPS Coordinates</string>
+    <string name="pref_camera_default">Default Camera</string>
+    <string name="pref_stabilization">Video Stabilization</string>
+    <string name="pref_app_lock">App Protection (Biometric / PIN)</string>
+    <string name="pref_change_pin">Set / Change PIN</string>
+    <string name="pref_max_duration">Max Duration Per Clip</string>
+    <string name="pref_auto_cleanup">Auto-delete Old Recordings</string>
+    <string name="pref_dark_mode">Theme Mode</string>
+    <string name="pref_backup_settings">Backup Settings</string>
+    <string name="pref_restore_settings">Restore Settings</string>
+
+    <!-- Auth -->
+    <string name="auth_title">Security Authentication</string>
+    <string name="auth_subtitle">Verify your identity to access surveillance archives</string>
+    <string name="auth_prompt_title">Unlock Gallery Security Recorder</string>
+    <string name="auth_prompt_subtitle">Use fingerprint or face recognition</string>
+    <string name="auth_enter_pin">Enter 4-Digit PIN</string>
+    <string name="auth_setup_pin">Setup 4-Digit Security PIN</string>
+    <string name="auth_confirm_pin">Confirm 4-Digit Security PIN</string>
+    <string name="auth_wrong_pin">Incorrect PIN. Try again.</string>
+    <string name="auth_pin_mismatch">PINs do not match. Try again.</string>
+
+    <!-- Storage Screen -->
+    <string name="storage_title">Storage Breakdown</string>
+    <string name="storage_internal">Internal Storage</string>
+    <string name="storage_external">SD Card Storage</string>
+    <string name="storage_recordings_total">Total Security Footage</string>
+    <string name="storage_cleanup_action">Clean Recordings Older than 30 Days</string>
+    <string name="storage_cleanup_done">%d old recordings removed</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Recording Alerts</string>
+    <string name="notification_channel_desc">Shows active recording and storage alerts</string>
+    <string name="notification_recording_title">Security Camera Active</string>
+    <string name="notification_recording_text">Explicit recording in progress.</string>
+
+    <!-- Permissions -->
+    <string name="permission_camera_rationale">Camera permission is required to capture security video clips.</string>
+    <string name="permission_audio_rationale">Audio permission is required if audio recording is enabled.</string>
+    <string name="permission_location_rationale">Location permission is required for geotagging footage.</string>
+    <string name="permission_grant">Grant Permissions</string>
+</resources>

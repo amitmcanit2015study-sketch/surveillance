@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/recorderRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0A0F1D">
+
+    <!-- Camera Preview (Background) -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Discrete Security Cover (Default: Active so camera preview is not visible to onlookers) -->
+    <FrameLayout
+        android:id="@+id/layoutDiscreteCover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#0A0F1D"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingHorizontal="32dp">
+
+            <!-- Security Badge & Pulsing Dot -->
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/ivSecurityShield"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/ic_security_shield"
+                    app:tint="#38BDF8" />
+
+                <View
+                    android:id="@+id/viewDiscreteRedDot"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="top|end"
+                    android:background="@drawable/bg_fab_record"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <!-- Status Text (RECORDING / NOT RECORDING) -->
+            <TextView
+                android:id="@+id/tvDiscreteStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:letterSpacing="0.05"
+                android:text="NOT RECORDING"
+                android:textColor="#94A3B8"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <!-- Live Timer Text -->
+            <TextView
+                android:id="@+id/tvDiscreteTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="monospace"
+                android:text="00:00:00"
+                android:textColor="#FFFFFF"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <!-- Subtitle / Hint -->
+            <TextView
+                android:id="@+id/tvDiscreteHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:lineSpacingMultiplier="1.2"
+                android:text="Standby · Tap shutter below or press Volume key to record"
+                android:textAlignment="center"
+                android:textColor="#64748B"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Rule of Thirds Grid Overlay (Visible only when preview is enabled) -->
+    <LinearLayout
+        android:id="@+id/gridOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#33FFFFFF" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#33FFFFFF" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <!-- Tap to Focus Indicator Ring -->
+    <ImageView
+        android:id="@+id/ivFocusRing"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:contentDescription="Focus"
+        android:src="@drawable/ic_focus_ring"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Zoom Badge Indicator -->
+    <TextView
+        android:id="@+id/tvZoomBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/bg_pill_badge"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="4dp"
+        android:text="1.0x"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/layoutRecordingIndicator"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Top Overlay Control Bar -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#66000000"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="36dp"
+        android:paddingBottom="12dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/action_cancel"
+            android:src="@drawable/ic_close"
+            app:tint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/tvRecorderTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="@string/app_name"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <!-- Toggle Preview (Switch between Discrete Text Mode & Live Viewfinder Peek) -->
+        <ImageButton
+            android:id="@+id/btnTogglePreview"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Toggle Viewfinder"
+            android:src="@drawable/ic_visibility_off"
+            app:tint="#FFFFFF" />
+
+        <!-- Grid Toggle -->
+        <ImageButton
+            android:id="@+id/btnToggleGrid"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Grid"
+            android:src="@drawable/ic_grid_view"
+            app:tint="#FFFFFF" />
+
+        <!-- Flash / Torch Toggle -->
+        <ImageButton
+            android:id="@+id/btnTorch"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/torch_on"
+            android:src="@drawable/ic_flash_off"
+            app:tint="#FFFFFF" />
+
+        <!-- Camera Switch (Front/Back) -->
+        <ImageButton
+            android:id="@+id/btnSwitchCamera"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/camera_flip"
+            android:src="@drawable/ic_camera_flip"
+            app:tint="#FFFFFF" />
+
+        <!-- Quality Toggle Chip (480p, 720p, 1080p, 4K) -->
+        <TextView
+            android:id="@+id/btnQualityToggle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_pill_badge"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:text="1080p"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Top Status Bar (Battery, GPS, Mic Indicator) -->
+    <LinearLayout
+        android:id="@+id/statusBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_glass_panel"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="6dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar">
+
+        <ImageView
+            android:id="@+id/ivGpsStatus"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:contentDescription="@string/location_tagging"
+            android:src="@drawable/ic_gps"
+            app:tint="#10B981" />
+
+        <TextView
+            android:id="@+id/tvGpsStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="GPS ON"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="12dp"
+            android:layout_marginHorizontal="8dp"
+            android:background="#40FFFFFF" />
+
+        <ImageView
+            android:id="@+id/ivBatteryStatus"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:contentDescription="@string/battery_warning"
+            android:src="@drawable/ic_battery"
+            app:tint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/tvBatteryStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp"
+            tools:text="85%" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="12dp"
+            android:layout_marginHorizontal="8dp"
+            android:background="#40FFFFFF" />
+
+        <ImageView
+            android:id="@+id/ivMicStatus"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:contentDescription="@string/pref_audio"
+            android:src="@drawable/ic_mic"
+            app:tint="#38BDF8" />
+
+        <TextView
+            android:id="@+id/tvMicStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="AUDIO ON"
+            android:textColor="#FFFFFF"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <!-- Storage Warning Banner -->
+    <TextView
+        android:id="@+id/tvStorageWarning"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="12dp"
+        android:background="#D9BA1A1A"
+        android:padding="8dp"
+        android:text="@string/storage_critical_message"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/statusBar" />
+
+    <!-- Live Recording Duration & Indicator (When live preview is visible) -->
+    <LinearLayout
+        android:id="@+id/layoutRecordingIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_glass_panel"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/bottomControlsBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <View
+            android:id="@+id/viewRedDot"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:background="@drawable/bg_fab_record" />
+
+        <TextView
+            android:id="@+id/tvRecordingDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:fontFamily="monospace"
+            android:text="00:00:00"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvRecordedFileSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textColor="#CBD5E1"
+            android:textSize="12sp"
+            tools:text="(12.4 MB)" />
+    </LinearLayout>
+
+    <!-- Bottom Controls Bar -->
+    <LinearLayout
+        android:id="@+id/bottomControlsBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#66000000"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingTop="16dp"
+        android:paddingBottom="36dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Audio Mute Toggle Button -->
+        <ImageButton
+            android:id="@+id/btnToggleAudio"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/pref_audio"
+            android:src="@drawable/ic_mic"
+            app:tint="#FFFFFF" />
+
+        <!-- Large Floating Shutter Button (Record / Stop) -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabShutter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/start_recording"
+            android:src="@drawable/ic_camera_record"
+            app:backgroundTint="@color/recording_red"
+            app:elevation="8dp"
+            app:fabCustomSize="76dp"
+            app:maxImageSize="36dp"
+            app:tint="#FFFFFF" />
+
+        <!-- Gallery / Quick review button -->
+        <ImageButton
+            android:id="@+id/btnGalleryQuickView"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/header_title"
+            android:src="@drawable/ic_security_shield"
+            app:tint="#FFFFFF" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_about"
+        android:icon="@drawable/ic_security_shield"
+        android:title="About" />
+    <item
+        android:id="@+id/action_storage"
+        android:icon="@drawable/ic_storage"
+        android:title="Storage Manager" />
+    <item
+        android:id="@+id/action_share_apk"
+        android:icon="@drawable/ic_share"
+        android:title="Share App (APK)" />
+</menu>

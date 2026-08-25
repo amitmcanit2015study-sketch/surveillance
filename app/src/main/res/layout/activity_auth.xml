@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <ImageView
+        android:id="@+id/ivAuthShield"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:contentDescription="@string/auth_title"
+        android:src="@drawable/ic_security_shield" />
+
+    <TextView
+        android:id="@+id/tvAuthTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/auth_enter_pin"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvAuthSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:text="@string/auth_subtitle"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="13sp" />
+
+    <!-- 4 PIN Dots indicator -->
+    <LinearLayout
+        android:id="@+id/layoutPinDots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal">
+
+        <View
+            android:id="@+id/dot1"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginHorizontal="8dp"
+            android:background="@drawable/bg_pill_badge" />
+
+        <View
+            android:id="@+id/dot2"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginHorizontal="8dp"
+            android:background="@drawable/bg_pill_badge" />
+
+        <View
+            android:id="@+id/dot3"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginHorizontal="8dp"
+            android:background="@drawable/bg_pill_badge" />
+
+        <View
+            android:id="@+id/dot4"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginHorizontal="8dp"
+            android:background="@drawable/bg_pill_badge" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvAuthError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:textColor="?attr/colorError"
+        android:textSize="13sp"
+        android:visibility="invisible"
+        tools:text="Incorrect PIN. Try again."
+        tools:visibility="visible" />
+
+    <!-- Number Pad Grid (1 to 9, Biometric, 0, Backspace) -->
+    <GridLayout
+        android:id="@+id/numPadGrid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:columnCount="3"
+        android:rowCount="4">
+
+        <!-- Row 1 -->
+        <Button
+            android:id="@+id/btnNum1"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_margin="8dp"
+            android:text="1"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnNum2"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_margin="8dp"
+            android:text="2"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnNum3"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_margin="8dp"
+            android:text="3"
+            android:textSize="20sp" />
+
+        <!-- Row 2 -->
+        <Button
+            android:id="@+id/btnNum4"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_margin="8dp"
+            android:text="4"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnNum5"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_margin="8dp"
+            android:text="5"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnNum6"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_margin="8dp"
+            android:text="6"
+            android:textSize="20sp" />
+
+        <!-- Row 3 -->
+        <Button
+            android:id="@+id/btnNum7"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_margin="8dp"
+            android:text="7"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnNum8"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_margin="8dp"
+            android:text="8"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnNum9"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_margin="8dp"
+            android:text="9"
+            android:textSize="20sp" />
+
+        <!-- Row 4 -->
+        <ImageButton
+            android:id="@+id/btnBiometricAuth"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_margin="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/auth_prompt_subtitle"
+            android:src="@drawable/ic_fingerprint"
+            app:tint="?attr/colorPrimary" />
+
+        <Button
+            android:id="@+id/btnNum0"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_margin="8dp"
+            android:text="0"
+            android:textSize="20sp" />
+
+        <ImageButton
+            android:id="@+id/btnNumBackspace"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_margin="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/action_cancel"
+            android:src="@drawable/ic_close"
+            app:tint="?attr/colorOnSurface" />
+    </GridLayout>
+
+</LinearLayout>
