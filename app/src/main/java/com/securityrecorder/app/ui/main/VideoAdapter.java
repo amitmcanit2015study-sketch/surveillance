@@ -25,6 +25,7 @@ public class VideoAdapter extends ListAdapter<VideoItem, VideoViewHolder> {
         void onFavoriteToggle(VideoItem video);
         void onVideoLongClick(VideoItem video);
         void onSelectionChanged(VideoItem video, boolean isSelected);
+        void onInfoClick(VideoItem video);
     }
 
     private boolean isGridLayout = true;

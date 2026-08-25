@@ -1110,7 +1110,7 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Section 4: Backup & Restore (Matching Screenshot #1) -->
+                    <!-- Section 4: Backup & Restore (Keep only Restore Settings) -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -1137,25 +1137,14 @@
                             android:padding="16dp">
 
                             <Button
-                                android:id="@+id/btnBackupSettings"
+                                android:id="@+id/btnRestoreSettings"
                                 style="@style/Widget.Material3.Button.TonalButton"
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
                                 android:backgroundTint="#0E4E6B"
-                                android:text="@string/pref_backup_settings"
+                                android:text="@string/pref_restore_settings"
                                 android:textColor="#FFFFFF"
                                 app:cornerRadius="24dp" />
-
-                            <Button
-                                android:id="@+id/btnRestoreSettings"
-                                style="@style/Widget.Material3.Button.OutlinedButton"
-                                android:layout_width="match_parent"
-                                android:layout_height="48dp"
-                                android:layout_marginTop="10dp"
-                                android:text="@string/pref_restore_settings"
-                                android:textColor="#E2E8F0"
-                                app:cornerRadius="24dp"
-                                app:strokeColor="#3F3F46" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
@@ -1272,17 +1261,28 @@
                     android:layout_height="1dp"
                     android:layout_weight="1" />
 
-                <!-- 2. Share Action -->
+                <!-- 2. Info / Metadata Action -->
+                <ImageButton
+                    android:id="@+id/btnSelectionInfo"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="View Metadata"
+                    android:src="@drawable/ic_info"
+                    app:tint="#E2E8F0" />
+
+                <!-- 3. Share Action -->
                 <ImageButton
                     android:id="@+id/btnSelectionShare"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Share"
                     android:src="@drawable/ic_share"
                     app:tint="#E2E8F0" />
 
-                <!-- 3. Heart / Like Action -->
+                <!-- 4. Heart / Like Action -->
                 <ImageButton
                     android:id="@+id/btnSelectionLike"
                     android:layout_width="40dp"
@@ -1293,7 +1293,7 @@
                     android:src="@drawable/ic_heart"
                     app:tint="#E2E8F0" />
 
-                <!-- 4. Lock / Move to Vault Action -->
+                <!-- 5. Lock / Move to Vault Action -->
                 <ImageButton
                     android:id="@+id/btnSelectionVault"
                     android:layout_width="40dp"
@@ -1304,7 +1304,7 @@
                     android:src="@drawable/ic_vault"
                     app:tint="#E2E8F0" />
 
-                <!-- 5. Delete Action -->
+                <!-- 6. Delete Action -->
                 <ImageButton
                     android:id="@+id/btnSelectionDelete"
                     android:layout_width="40dp"
@@ -1315,7 +1315,7 @@
                     android:src="@drawable/ic_delete"
                     app:tint="#EF4444" />
 
-                <!-- 6. Close / Cancel Selection -->
+                <!-- 7. Close / Cancel Selection -->
                 <ImageButton
                     android:id="@+id/btnSelectionClose"
                     android:layout_width="40dp"

@@ -6,6 +6,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -43,10 +44,12 @@ import com.securityrecorder.app.ui.auth.AuthActivity;
 import com.securityrecorder.app.ui.common.AboutActivity;
 import com.securityrecorder.app.ui.player.AudioPlayerBottomSheet;
 import com.securityrecorder.app.ui.player.ImageViewerDialog;
+import com.securityrecorder.app.ui.player.MetadataBottomSheetDialog;
 import com.securityrecorder.app.ui.player.VideoPlayerActivity;
 import com.securityrecorder.app.ui.storage.StorageManagerActivity;
 import com.securityrecorder.app.utils.FileUtils;
 import com.securityrecorder.app.utils.HapticUtils;
+import com.securityrecorder.app.utils.LocationHelper;
 import com.securityrecorder.app.utils.NotificationHelper;
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -60,9 +63,11 @@ import java.util.Locale;
  * - 4 Bottom Icon-only tabs: Home, Files, Vault, Settings
  * - Home Tab: 3 action buttons on bottom (Audio, Photo, Video), Geo-tag toggle, Video preview button
  * - Stealth Recording: Discrete top-right red blinking dot indicator
+ * - Photos & Videos: Geo-Tag watermark stamping & metadata storing
+ * - Metadata Viewer: Complete file metadata inspection on file item & selection bar
  * - Files Tab: Clean media list (Videos, Audios, Photos) with playback and floating multi-selection bar
  * - Vault Tab: Secure PIN-protected private files gallery with unvaulting
- * - Settings Tab: Configuration matching user specifications
+ * - Settings Tab: Configuration with Restore Settings and unified theme
  * - Top Toolbar: Search toggle, Grid/List toggle, and 3-dots overflow menu opening About screen
  * Developed by: Amit Bharat · Rooys Soft Tech
  */
@@ -135,6 +140,21 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
                     captureStealthPhoto();
                 } else {
                     Toast.makeText(this, R.string.permission_camera_rationale, Toast.LENGTH_LONG).show();
+                }
+            });
+
+    private final ActivityResultLauncher<String[]> locationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                boolean fine = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_FINE_LOCATION));
+                boolean coarse = Boolean.TRUE.equals(result.get(Manifest.permission.ACCESS_COARSE_LOCATION));
+                if (fine || coarse) {
+                    preferences.setLocationEnabled(true);
+                    updateGeoTagButtonUi();
+                    Toast.makeText(this, "GPS Geo-Tagging Enabled", Toast.LENGTH_SHORT).show();
+                } else {
+                    preferences.setLocationEnabled(false);
+                    updateGeoTagButtonUi();
+                    Toast.makeText(this, "Location permission required for Geo-Tagging", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -316,10 +336,23 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
         // GeoTag Toggle Button
         binding.btnToggleGeoTag.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
-            boolean newState = !preferences.isLocationEnabled();
-            preferences.setLocationEnabled(newState);
-            updateGeoTagButtonUi();
-            Toast.makeText(this, newState ? "GPS Geo-Tagging Enabled" : "GPS Geo-Tagging Disabled", Toast.LENGTH_SHORT).show();
+            boolean willEnable = !preferences.isLocationEnabled();
+            if (willEnable) {
+                if (LocationHelper.hasLocationPermission(this)) {
+                    preferences.setLocationEnabled(true);
+                    updateGeoTagButtonUi();
+                    Toast.makeText(this, "GPS Geo-Tagging Enabled", Toast.LENGTH_SHORT).show();
+                } else {
+                    locationPermissionLauncher.launch(new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                    });
+                }
+            } else {
+                preferences.setLocationEnabled(false);
+                updateGeoTagButtonUi();
+                Toast.makeText(this, "GPS Geo-Tagging Disabled", Toast.LENGTH_SHORT).show();
+            }
         });
 
         // Video Preview Toggle Button (appears when video is recording)
@@ -451,6 +484,11 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
             public void onSelectionChanged(VideoItem video, boolean isSelected) {
                 MainActivity.this.onSelectionChanged(video, isSelected);
             }
+
+            @Override
+            public void onInfoClick(VideoItem video) {
+                MainActivity.this.onInfoClick(video);
+            }
         });
         binding.rvVaultVideos.setAdapter(vaultAdapter);
 
@@ -525,8 +563,20 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
         // Location Switch
         binding.switchLocation.setOnCheckedChangeListener((btn, checked) -> {
             HapticUtils.performClickFeedback(this);
-            preferences.setLocationEnabled(checked);
-            updateGeoTagButtonUi();
+            if (checked) {
+                if (LocationHelper.hasLocationPermission(this)) {
+                    preferences.setLocationEnabled(true);
+                    updateGeoTagButtonUi();
+                } else {
+                    locationPermissionLauncher.launch(new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                    });
+                }
+            } else {
+                preferences.setLocationEnabled(false);
+                updateGeoTagButtonUi();
+            }
         });
 
         // Stabilization Switch
@@ -608,18 +658,6 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
                     }).show();
         });
 
-        // Backup Settings
-        binding.btnBackupSettings.setOnClickListener(v -> {
-            HapticUtils.performClickFeedback(this);
-            String json = preferences.exportSettingsToJson();
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            ClipData clip = ClipData.newPlainText("Surveillance Settings", json);
-            if (clipboard != null) {
-                clipboard.setPrimaryClip(clip);
-                Toast.makeText(this, "Settings configuration copied to clipboard", Toast.LENGTH_SHORT).show();
-            }
-        });
-
         // Restore Settings
         binding.btnRestoreSettings.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
@@ -674,7 +712,7 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
         pinSetupLauncher.launch(intent);
     }
 
-    // --- Floating Multi-Selection Bar (Without List/Grid icon) ---
+    // --- Floating Multi-Selection Bar with Metadata Info Action ---
 
     private void setupSelectionBar() {
         // 1. Status / Count toggle (Select all / Deselect all)
@@ -688,7 +726,17 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
             updateSelectionBar();
         });
 
-        // 2. Share
+        // 2. Info / Metadata
+        binding.btnSelectionInfo.setOnClickListener(v -> {
+            HapticUtils.performClickFeedback(this);
+            VideoAdapter currentAdapter = getCurrentActiveAdapter();
+            List<VideoItem> items = currentAdapter.getSelectedItems();
+            if (!items.isEmpty()) {
+                onInfoClick(items.get(0));
+            }
+        });
+
+        // 3. Share
         binding.btnSelectionShare.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
             VideoAdapter currentAdapter = getCurrentActiveAdapter();
@@ -702,7 +750,7 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
             FileUtils.shareMultipleFiles(this, paths);
         });
 
-        // 3. Like / Heart
+        // 4. Like / Heart
         binding.btnSelectionLike.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
             VideoAdapter currentAdapter = getCurrentActiveAdapter();
@@ -715,7 +763,7 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
             });
         });
 
-        // 4. Vault (Move to Vault or Restore from Vault)
+        // 5. Vault (Move to Vault or Restore from Vault)
         binding.btnSelectionVault.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
             VideoAdapter currentAdapter = getCurrentActiveAdapter();
@@ -735,13 +783,13 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
             }
         });
 
-        // 5. Delete
+        // 6. Delete
         binding.btnSelectionDelete.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
             promptDeleteSelectedVideos();
         });
 
-        // 6. Close
+        // 7. Close
         binding.btnSelectionClose.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
             exitSelectionMode();
@@ -773,6 +821,8 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
         binding.btnSelectionVault.setImageResource(currentTabId == R.id.nav_vault ? R.drawable.ic_vault_unlocked : R.drawable.ic_vault);
 
         boolean hasSelection = selectedCount > 0;
+        binding.btnSelectionInfo.setEnabled(hasSelection);
+        binding.btnSelectionInfo.setAlpha(hasSelection ? 1.0f : 0.4f);
         binding.btnSelectionShare.setEnabled(hasSelection);
         binding.btnSelectionShare.setAlpha(hasSelection ? 1.0f : 0.4f);
         binding.btnSelectionLike.setEnabled(hasSelection);
@@ -802,7 +852,15 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
                 .show();
     }
 
-    // --- Media Item Clicks & Interactions ---
+    // --- Media Item Clicks, Metadata & Interactions ---
+
+    @Override
+    public void onInfoClick(VideoItem video) {
+        if (video != null) {
+            HapticUtils.performClickFeedback(this);
+            MetadataBottomSheetDialog.newInstance(video).show(getSupportFragmentManager(), "MetadataDialog");
+        }
+    }
 
     @Override
     public void onVideoClick(VideoItem item) {
@@ -980,7 +1038,7 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
         });
     }
 
-    // --- Photo Capture Pipeline ---
+    // --- Photo Capture Pipeline with Geotag Watermark & EXIF ---
 
     private void initPhotoCapturePipeline() {
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
@@ -1034,6 +1092,14 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
             @Override
             public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                 HapticUtils.performRecordingStopFeedback(MainActivity.this);
+
+                // Check if Geo-Tagging is enabled
+                String locationStr = null;
+                if (preferences.isLocationEnabled()) {
+                    Location loc = LocationHelper.getLastKnownLocation(MainActivity.this);
+                    locationStr = LocationHelper.stampGeoTagOnImage(MainActivity.this, photoFile, loc);
+                }
+
                 binding.layoutRecordingDot.postDelayed(() -> {
                     Boolean isVideoRec = CameraRecordingService.isRecordingLiveData.getValue();
                     Boolean isAudioRec = AudioRecordingService.isAudioRecordingLiveData.getValue();
@@ -1042,8 +1108,9 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
                     }
                 }, 1000);
 
+                final String finalLocation = locationStr;
                 viewModel.insertPhoto(photoFile, () -> {
-                    Toast.makeText(MainActivity.this, "Photo captured & saved to Files", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, finalLocation != null ? "Geotagged photo captured & saved" : "Photo captured & saved", Toast.LENGTH_SHORT).show();
                     viewModel.syncStorage();
                 });
             }

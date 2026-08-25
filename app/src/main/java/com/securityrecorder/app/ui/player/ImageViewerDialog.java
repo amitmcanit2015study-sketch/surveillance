@@ -70,6 +70,14 @@ public class ImageViewerDialog extends Dialog {
             dismiss();
         });
 
+        binding.btnImageInfo.setOnClickListener(v -> {
+            HapticUtils.performClickFeedback(getContext());
+            if (getContext() instanceof androidx.fragment.app.FragmentActivity) {
+                MetadataBottomSheetDialog.newInstance(imageItem)
+                        .show(((androidx.fragment.app.FragmentActivity) getContext()).getSupportFragmentManager(), "MetadataDialog");
+            }
+        });
+
         binding.btnImageShare.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(getContext());
             FileUtils.shareFile(getContext(), imageItem.getFilePath());

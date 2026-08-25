@@ -23,7 +23,7 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
-    <!-- Rounded Square Thumbnail matching user screenshot #3 -->
+    <!-- Rounded Square Thumbnail -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="64dp"
         android:layout_height="64dp"
@@ -108,27 +108,25 @@
                 android:textColor="#A1A1AA"
                 android:textSize="13sp"
                 tools:text="Yesterday" />
-
-            <TextView
-                android:id="@+id/tvResolution"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:background="@drawable/bg_pill_badge"
-                android:paddingHorizontal="5dp"
-                android:paddingVertical="1dp"
-                android:textColor="#CBD5E1"
-                android:textSize="9sp"
-                android:visibility="gone"
-                tools:text="1080p" />
         </LinearLayout>
     </LinearLayout>
+
+    <!-- Info Button -->
+    <ImageButton
+        android:id="@+id/btnInfo"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="View Metadata"
+        android:src="@drawable/ic_info"
+        app:tint="#71717A" />
 
     <!-- Favorite Star Button -->
     <ImageButton
         android:id="@+id/btnFavorite"
         android:layout_width="36dp"
         android:layout_height="36dp"
+        android:layout_marginStart="2dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/filter_favorites"
         android:src="@drawable/ic_star_outline"

@@ -13,7 +13,7 @@ import com.securityrecorder.app.utils.DateTimeUtils;
 import com.securityrecorder.app.utils.FileUtils;
 
 /**
- * Bottom sheet displaying full EXIF, codec, and recording metadata.
+ * Bottom sheet displaying full EXIF, location coordinates, codec, file size, and recording metadata.
  */
 public class MetadataBottomSheetDialog extends BottomSheetDialogFragment {
 
@@ -51,8 +51,23 @@ public class MetadataBottomSheetDialog extends BottomSheetDialogFragment {
         if (videoItem != null) {
             binding.tvMetaFilename.setText(videoItem.getTitle());
             binding.tvMetaDate.setText(DateTimeUtils.formatDisplayDate(videoItem.getTimestamp()));
-            binding.tvMetaDuration.setText(DateTimeUtils.formatDuration(videoItem.getDurationMs()));
-            binding.tvMetaSize.setText(FileUtils.formatFileSize(videoItem.getSizeBytes()));
+
+            String typeStr = "Video Recording";
+            if (videoItem.isAudio()) {
+                typeStr = "Audio Recording (M4A)";
+            } else if (videoItem.isImage()) {
+                typeStr = "Photo / Image";
+            }
+            binding.tvMetaType.setText(typeStr);
+            binding.tvMetaVault.setText(videoItem.isVault() ? "🔒 Protected in Vault" : "Standard Archive");
+
+            if (videoItem.isImage()) {
+                binding.tvMetaDuration.setText("N/A (Photo)");
+            } else {
+                binding.tvMetaDuration.setText(DateTimeUtils.formatDuration(videoItem.getDurationMs()));
+            }
+
+            binding.tvMetaSize.setText(FileUtils.formatFileSize(videoItem.getSizeBytes()) + " (" + videoItem.getSizeBytes() + " bytes)");
             binding.tvMetaResolution.setText(videoItem.getResolution() != null ? videoItem.getResolution() : "1080p");
             binding.tvMetaCodec.setText(videoItem.getCodec() != null ? videoItem.getCodec() : "video/mp4");
             binding.tvMetaLocation.setText(videoItem.getLocation() != null ? videoItem.getLocation() : "Not available");

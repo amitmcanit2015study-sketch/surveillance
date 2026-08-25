@@ -14,7 +14,7 @@ import com.securityrecorder.app.utils.FileUtils;
 import java.io.File;
 
 /**
- * ViewHolder supporting both Grid and List presentation for videos, audios, and photos with multi-select checkboxes.
+ * ViewHolder supporting both Grid and List presentation for videos, audios, and photos with info/metadata button and multi-select checkboxes.
  */
 public abstract class VideoViewHolder extends RecyclerView.ViewHolder {
 
@@ -103,6 +103,10 @@ public abstract class VideoViewHolder extends RecyclerView.ViewHolder {
                 return true;
             });
 
+            binding.btnInfo.setOnClickListener(v -> {
+                if (listener != null) listener.onInfoClick(item);
+            });
+
             binding.btnFavorite.setOnClickListener(v -> {
                 if (listener != null) listener.onFavoriteToggle(item);
             });
@@ -142,14 +146,12 @@ public abstract class VideoViewHolder extends RecyclerView.ViewHolder {
             if (item.isAudio()) {
                 binding.tvDuration.setVisibility(View.VISIBLE);
                 binding.tvDuration.setText(DateTimeUtils.formatDuration(item.getDurationMs()));
-                binding.tvResolution.setText("Audio");
                 Glide.with(itemView.getContext()).clear(binding.ivThumbnail);
                 binding.ivThumbnail.setImageResource(R.drawable.ic_audio_file);
                 binding.ivThumbnail.setScaleType(ImageView.ScaleType.FIT_CENTER);
                 binding.ivThumbnail.setPadding(16, 16, 16, 16);
             } else if (item.isImage()) {
                 binding.tvDuration.setVisibility(View.GONE);
-                binding.tvResolution.setText("Photo");
                 binding.ivThumbnail.setPadding(0, 0, 0, 0);
                 binding.ivThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 Glide.with(itemView.getContext())
@@ -161,7 +163,6 @@ public abstract class VideoViewHolder extends RecyclerView.ViewHolder {
                 // Video
                 binding.tvDuration.setVisibility(View.VISIBLE);
                 binding.tvDuration.setText(DateTimeUtils.formatDuration(item.getDurationMs()));
-                binding.tvResolution.setText(item.getResolution() != null ? item.getResolution() : "1080p");
                 binding.ivThumbnail.setPadding(0, 0, 0, 0);
                 binding.ivThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 Glide.with(itemView.getContext())
@@ -188,6 +189,10 @@ public abstract class VideoViewHolder extends RecyclerView.ViewHolder {
                     listener.onVideoLongClick(item);
                 }
                 return true;
+            });
+
+            binding.btnInfo.setOnClickListener(v -> {
+                if (listener != null) listener.onInfoClick(item);
             });
 
             binding.btnFavorite.setOnClickListener(v -> {
