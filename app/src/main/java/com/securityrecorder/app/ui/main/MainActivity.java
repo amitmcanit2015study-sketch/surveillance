@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -80,6 +81,24 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
     private int currentTabId = R.id.nav_home;
     private ImageCapture imageCapture;
     private boolean isSmallPreviewVisible = false;
+    private long lastBackPressTime = 0;
+    private static final long BACK_PRESS_INTERVAL = 2000L;
+
+    private final android.content.BroadcastReceiver screenOffReceiver = new android.content.BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
+                Boolean isVideoRec = CameraRecordingService.isRecordingLiveData.getValue();
+                if (Boolean.TRUE.equals(isVideoRec)) {
+                    stopRecordingService();
+                }
+                Boolean isAudioRec = AudioRecordingService.isAudioRecordingLiveData.getValue();
+                if (Boolean.TRUE.equals(isAudioRec)) {
+                    stopAudioRecordingService();
+                }
+            }
+        }
+    };
 
     private final ActivityResultLauncher<Intent> appAuthLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -163,7 +182,14 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
         preferences = new AppPreferences(this);
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
+        // Keep screen awake while app is in active use
+        getWindow().addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         NotificationHelper.createNotificationChannels(this);
+
+        // Register screen lock / screen off receiver to auto-save files when physical power button is pressed
+        IntentFilter screenFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+        registerReceiver(screenOffReceiver, screenFilter);
 
         checkAppSecurityLock();
         setupBottomNavigation();
@@ -1223,6 +1249,21 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
             binding.bottomNavigationView.setSelectedItemId(R.id.nav_home);
             return;
         }
-        super.onBackPressed();
+
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastBackPressTime < BACK_PRESS_INTERVAL) {
+            finishAffinity();
+        } else {
+            lastBackPressTime = currentTime;
+            Toast.makeText(this, "Press back again to exit", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            unregisterReceiver(screenOffReceiver);
+        } catch (Exception ignored) {}
     }
 }

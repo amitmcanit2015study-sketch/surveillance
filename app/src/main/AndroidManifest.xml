@@ -53,6 +53,18 @@
         android:theme="@style/Theme.GallerySecurityRecorder"
         tools:targetApi="34">
 
+        <!-- Splash Launcher Screen with Brand & Developer Credits -->
+        <activity
+            android:name=".ui.common.SplashActivity"
+            android:configChanges="orientation|screenSize"
+            android:exported="true"
+            android:theme="@style/Theme.GallerySecurityRecorder.FullScreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <!-- Main Gallery Home Screen -->
         <activity
             android:name=".ui.main.MainActivity"
@@ -60,12 +72,7 @@
             android:exported="true"
             android:launchMode="singleTop"
             android:supportsPictureInPicture="true"
-            android:windowSoftInputMode="adjustPan">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:windowSoftInputMode="adjustPan" />
 
         <!-- Camera Recording Screen (Secure Lock-Screen Compatible & Shortcut Target) -->
         <activity

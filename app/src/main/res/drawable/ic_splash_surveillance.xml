@@ -1,0 +1,43 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="88dp"
+    android:height="88dp"
+    android:viewportWidth="88"
+    android:viewportHeight="88">
+
+    <!-- Outer Security Shield Background -->
+    <path
+        android:fillColor="#1E1B4B"
+        android:pathData="M44,6 L16,18 L16,42 C16,61 28,78 44,82 C60,78 72,61 72,42 L72,18 L44,6 Z" />
+
+    <!-- Inner Shield Gradient/Accent Border -->
+    <path
+        android:fillColor="#38BDF8"
+        android:fillAlpha="0.18"
+        android:pathData="M44,11 L20,21 L20,42 C20,58 30,73 44,77 C58,73 68,58 68,42 L68,21 L44,11 Z" />
+
+    <path
+        android:fillColor="#38BDF8"
+        android:strokeColor="#38BDF8"
+        android:strokeWidth="1.5"
+        android:pathData="M44,11 L20,21 L20,42 C20,58 30,73 44,77 C58,73 68,58 68,42 L68,21 L44,11 Z" />
+
+    <!-- Surveillance CCTV Camera Body -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M27,33 L49,27 C51.2,26.4 53.5,27.7 54.1,29.9 L56.7,39.6 C57.3,41.8 56,44.1 53.8,44.7 L31.8,50.7 C29.6,51.3 27.3,50 26.7,47.8 L24.1,38.1 C23.5,35.9 24.8,33.6 27,33 Z" />
+
+    <!-- Camera Lens Cone -->
+    <path
+        android:fillColor="#0284C7"
+        android:pathData="M54.5,31 L64,25 L64,48 L52,43 Z" />
+
+    <!-- Surveillance Lens Eye Center -->
+    <path
+        android:fillColor="#EF4444"
+        android:pathData="M64,36.5 C64,38.4 62.4,40 60.5,40 C58.6,40 57,38.4 57,36.5 C57,34.6 58.6,33 60.5,33 C62.4,33 64,34.6 64,36.5 Z" />
+
+    <!-- Camera Mount Stand -->
+    <path
+        android:fillColor="#94A3B8"
+        android:pathData="M38,49 L38,62 L32,65 L32,67 L46,67 L46,65 L40,62 L40,48.5 Z" />
+</vector>
