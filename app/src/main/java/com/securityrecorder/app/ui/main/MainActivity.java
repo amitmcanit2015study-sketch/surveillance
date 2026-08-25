@@ -46,7 +46,6 @@ import com.securityrecorder.app.ui.player.AudioPlayerBottomSheet;
 import com.securityrecorder.app.ui.player.ImageViewerDialog;
 import com.securityrecorder.app.ui.player.MetadataBottomSheetDialog;
 import com.securityrecorder.app.ui.player.VideoPlayerActivity;
-import com.securityrecorder.app.ui.storage.StorageManagerActivity;
 import com.securityrecorder.app.utils.FileUtils;
 import com.securityrecorder.app.utils.HapticUtils;
 import com.securityrecorder.app.utils.LocationHelper;
@@ -61,14 +60,11 @@ import java.util.Locale;
 /**
  * Main Surveillance Activity:
  * - 4 Bottom Icon-only tabs: Home, Files, Vault, Settings
- * - Home Tab: 3 action buttons on bottom (Audio, Photo, Video), Geo-tag toggle, Video preview button
- * - Stealth Recording: Discrete top-right red blinking dot indicator
- * - Photos & Videos: Geo-Tag watermark stamping & metadata storing
- * - Metadata Viewer: Complete file metadata inspection on file item & selection bar
- * - Files Tab: Clean media list (Videos, Audios, Photos) with playback and floating multi-selection bar
- * - Vault Tab: Secure PIN-protected private files gallery with unvaulting
- * - Settings Tab: Configuration with Restore Settings and unified theme
- * - Top Toolbar: Search toggle, Grid/List toggle, and 3-dots overflow menu opening About screen
+ * - Single Exclusive Active Recording Mode (Audio, Photo, Video)
+ * - Geo-Tag & Camera device watermark stamping on image & metadata persistence
+ * - Metadata Viewer from Item & Selection Bar
+ * - Instant Favorite Star toggle and persistence
+ * - 3-dots toolbar opening About Screen
  * Developed by: Amit Bharat · Rooys Soft Tech
  */
 public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVideoItemClickListener {
@@ -179,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
         setupSelectionBar();
         observeViewModel();
         observeRecordingServices();
-        initPhotoCapturePipeline();
         handleIncomingIntent(getIntent());
 
         switchToTab(R.id.nav_home);
@@ -289,29 +284,8 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
 
         binding.btnMenuOverflow.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
-            showToolbarOverflowMenu(v);
+            startActivity(new Intent(this, AboutActivity.class));
         });
-    }
-
-    private void showToolbarOverflowMenu(View anchor) {
-        PopupMenu popup = new PopupMenu(this, anchor);
-        popup.getMenuInflater().inflate(R.menu.menu_toolbar_overflow, popup.getMenu());
-        popup.setOnMenuItemClickListener(item -> {
-            HapticUtils.performClickFeedback(this);
-            int id = item.getItemId();
-            if (id == R.id.action_about) {
-                startActivity(new Intent(this, AboutActivity.class));
-                return true;
-            } else if (id == R.id.action_storage) {
-                startActivity(new Intent(this, StorageManagerActivity.class));
-                return true;
-            } else if (id == R.id.action_share_apk) {
-                FileUtils.shareApp(this);
-                return true;
-            }
-            return false;
-        });
-        popup.show();
     }
 
     private void updateToggleLayoutIcon(boolean isGrid) {
@@ -328,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
         }
     }
 
-    // --- Tab 1: Home Dashboard ---
+    // --- Tab 1: Home Dashboard (Mutually Exclusive Recording Actions) ---
 
     private void setupHomeTab() {
         updateGeoTagButtonUi();
@@ -367,9 +341,17 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
         binding.fabHomeAudio.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
             Boolean isAudioRec = AudioRecordingService.isAudioRecordingLiveData.getValue();
-            if (Boolean.TRUE.equals(isAudioRec)) {
+            Boolean isVideoRec = CameraRecordingService.isRecordingLiveData.getValue();
+
+            if (Boolean.TRUE.equals(isVideoRec)) {
+                // If video is recording, stop it and start audio
+                stopRecordingService();
+                binding.getRoot().postDelayed(this::checkPermissionsAndStartAudioRecording, 300);
+            } else if (Boolean.TRUE.equals(isAudioRec)) {
+                // Stop audio recording
                 stopAudioRecordingService();
             } else {
+                // Start audio recording
                 checkPermissionsAndStartAudioRecording();
             }
         });
@@ -377,16 +359,34 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
         // Photo Button (Stealth capture)
         binding.fabHomePhoto.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
-            checkPermissionsAndCapturePhoto();
+            Boolean isAudioRec = AudioRecordingService.isAudioRecordingLiveData.getValue();
+            Boolean isVideoRec = CameraRecordingService.isRecordingLiveData.getValue();
+
+            if (Boolean.TRUE.equals(isVideoRec)) {
+                stopRecordingService();
+            }
+            if (Boolean.TRUE.equals(isAudioRec)) {
+                stopAudioRecordingService();
+            }
+
+            binding.getRoot().postDelayed(this::checkPermissionsAndCapturePhoto, 200);
         });
 
         // Video Button
         binding.fabHomeVideo.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
-            Boolean isRecording = CameraRecordingService.isRecordingLiveData.getValue();
-            if (Boolean.TRUE.equals(isRecording)) {
+            Boolean isAudioRec = AudioRecordingService.isAudioRecordingLiveData.getValue();
+            Boolean isVideoRec = CameraRecordingService.isRecordingLiveData.getValue();
+
+            if (Boolean.TRUE.equals(isAudioRec)) {
+                // If audio is recording, stop it and start video
+                stopAudioRecordingService();
+                binding.getRoot().postDelayed(this::checkPermissionsAndStartRecording, 300);
+            } else if (Boolean.TRUE.equals(isVideoRec)) {
+                // Stop video recording
                 stopRecordingService();
             } else {
+                // Start video recording
                 checkPermissionsAndStartRecording();
             }
         });
@@ -673,17 +673,6 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
             } else {
                 Toast.makeText(this, "Clipboard is empty", Toast.LENGTH_SHORT).show();
             }
-        });
-
-        // Open About & Share App
-        binding.btnOpenAbout.setOnClickListener(v -> {
-            HapticUtils.performClickFeedback(this);
-            startActivity(new Intent(this, AboutActivity.class));
-        });
-
-        binding.btnShareAppSetting.setOnClickListener(v -> {
-            HapticUtils.performClickFeedback(this);
-            FileUtils.shareApp(this);
         });
     }
 
@@ -1040,29 +1029,6 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
 
     // --- Photo Capture Pipeline with Geotag Watermark & EXIF ---
 
-    private void initPhotoCapturePipeline() {
-        ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
-        cameraProviderFuture.addListener(() -> {
-            try {
-                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
-                imageCapture = new ImageCapture.Builder()
-                        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-                        .build();
-
-                Preview preview = new Preview.Builder().build();
-                preview.setSurfaceProvider(binding.previewViewHidden.getSurfaceProvider());
-
-                CameraSelector cameraSelector = preferences.isFrontCamera()
-                        ? CameraSelector.DEFAULT_FRONT_CAMERA
-                        : CameraSelector.DEFAULT_BACK_CAMERA;
-
-                cameraProvider.unbindAll();
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
-
-            } catch (Exception ignored) {}
-        }, ContextCompat.getMainExecutor(this));
-    }
-
     private void checkPermissionsAndCapturePhoto() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             captureStealthPhoto();
@@ -1072,55 +1038,70 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
     }
 
     private void captureStealthPhoto() {
-        if (imageCapture == null) {
-            initPhotoCapturePipeline();
-            Toast.makeText(this, "Initializing camera, please tap photo again", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        File recDir = FileUtils.getRecordingDirectory(this);
-        String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US).format(new Date());
-        File photoFile = new File(recDir, "PHOTO_" + timestamp + ".jpg");
-
-        ImageCapture.OutputFileOptions outputOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
-
         HapticUtils.performRecordingStartFeedback(this);
         binding.layoutRecordingDot.setVisibility(View.VISIBLE);
         binding.tvCornerRecordingTime.setText("CAPTURE");
 
-        imageCapture.takePicture(outputOptions, ContextCompat.getMainExecutor(this), new ImageCapture.OnImageSavedCallback() {
-            @Override
-            public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                HapticUtils.performRecordingStopFeedback(MainActivity.this);
+        ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
+        cameraProviderFuture.addListener(() -> {
+            try {
+                ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
+                cameraProvider.unbindAll();
 
-                // Check if Geo-Tagging is enabled
-                String locationStr = null;
-                if (preferences.isLocationEnabled()) {
-                    Location loc = LocationHelper.getLastKnownLocation(MainActivity.this);
-                    locationStr = LocationHelper.stampGeoTagOnImage(MainActivity.this, photoFile, loc);
-                }
+                ImageCapture capture = new ImageCapture.Builder()
+                        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+                        .build();
 
-                binding.layoutRecordingDot.postDelayed(() -> {
-                    Boolean isVideoRec = CameraRecordingService.isRecordingLiveData.getValue();
-                    Boolean isAudioRec = AudioRecordingService.isAudioRecordingLiveData.getValue();
-                    if (!Boolean.TRUE.equals(isVideoRec) && !Boolean.TRUE.equals(isAudioRec)) {
-                        binding.layoutRecordingDot.setVisibility(View.GONE);
+                CameraSelector cameraSelector = preferences.isFrontCamera()
+                        ? CameraSelector.DEFAULT_FRONT_CAMERA
+                        : CameraSelector.DEFAULT_BACK_CAMERA;
+
+                cameraProvider.bindToLifecycle(this, cameraSelector, capture);
+
+                File recDir = FileUtils.getRecordingDirectory(this);
+                String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US).format(new Date());
+                File photoFile = new File(recDir, "PHOTO_" + timestamp + ".jpg");
+
+                ImageCapture.OutputFileOptions outputOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
+
+                capture.takePicture(outputOptions, ContextCompat.getMainExecutor(this), new ImageCapture.OnImageSavedCallback() {
+                    @Override
+                    public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                        HapticUtils.performRecordingStopFeedback(MainActivity.this);
+
+                        String locationStr = "Not available";
+                        if (preferences.isLocationEnabled()) {
+                            Location loc = LocationHelper.getLastKnownLocation(MainActivity.this);
+                            locationStr = LocationHelper.stampGeoTagOnImage(MainActivity.this, photoFile, loc);
+                        }
+
+                        binding.layoutRecordingDot.postDelayed(() -> {
+                            Boolean isVideoRec = CameraRecordingService.isRecordingLiveData.getValue();
+                            Boolean isAudioRec = AudioRecordingService.isAudioRecordingLiveData.getValue();
+                            if (!Boolean.TRUE.equals(isVideoRec) && !Boolean.TRUE.equals(isAudioRec)) {
+                                binding.layoutRecordingDot.setVisibility(View.GONE);
+                            }
+                        }, 1000);
+
+                        final String finalLocation = locationStr;
+                        viewModel.insertPhoto(photoFile, finalLocation, () -> {
+                            Toast.makeText(MainActivity.this, preferences.isLocationEnabled() ? "Geotagged photo captured & saved" : "Photo captured & saved", Toast.LENGTH_SHORT).show();
+                            viewModel.syncStorage();
+                        });
                     }
-                }, 1000);
 
-                final String finalLocation = locationStr;
-                viewModel.insertPhoto(photoFile, () -> {
-                    Toast.makeText(MainActivity.this, finalLocation != null ? "Geotagged photo captured & saved" : "Photo captured & saved", Toast.LENGTH_SHORT).show();
-                    viewModel.syncStorage();
+                    @Override
+                    public void onError(@NonNull ImageCaptureException exception) {
+                        binding.layoutRecordingDot.setVisibility(View.GONE);
+                        Toast.makeText(MainActivity.this, "Photo capture failed: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 });
-            }
 
-            @Override
-            public void onError(@NonNull ImageCaptureException exception) {
+            } catch (Exception e) {
                 binding.layoutRecordingDot.setVisibility(View.GONE);
-                Toast.makeText(MainActivity.this, "Photo capture failed: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Camera error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
-        });
+        }, ContextCompat.getMainExecutor(this));
     }
 
     // --- Service Starters & Permissions ---

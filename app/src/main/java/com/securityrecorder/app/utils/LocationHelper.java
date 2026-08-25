@@ -42,16 +42,14 @@ public class LocationHelper {
 
         Location bestLocation = null;
         try {
-            Location gpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            Location networkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            Location passiveLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-
-            if (gpsLocation != null) {
-                bestLocation = gpsLocation;
-            } else if (networkLocation != null) {
-                bestLocation = networkLocation;
-            } else {
-                bestLocation = passiveLocation;
+            List<String> providers = locationManager.getProviders(true);
+            for (String provider : providers) {
+                Location l = locationManager.getLastKnownLocation(provider);
+                if (l != null) {
+                    if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy() || l.getTime() > bestLocation.getTime()) {
+                        bestLocation = l;
+                    }
+                }
             }
         } catch (Exception ignored) {}
 
@@ -60,7 +58,7 @@ public class LocationHelper {
 
     public static String formatCoordinates(Location location) {
         if (location == null) return "Not available";
-        return String.format(Locale.US, "%.5f, %.5f", location.getLatitude(), location.getLongitude());
+        return String.format(Locale.US, "%.5f° N, %.5f° E", location.getLatitude(), location.getLongitude());
     }
 
     public static String getFullLocationString(Context context, Location location) {
@@ -82,10 +80,15 @@ public class LocationHelper {
                 if (addresses != null && !addresses.isEmpty()) {
                     Address addr = addresses.get(0);
                     StringBuilder sb = new StringBuilder();
+                    if (addr.getAddressLine(0) != null) {
+                        return addr.getAddressLine(0);
+                    }
+                    if (addr.getThoroughfare() != null) {
+                        sb.append(addr.getThoroughfare());
+                    }
                     if (addr.getLocality() != null) {
+                        if (sb.length() > 0) sb.append(", ");
                         sb.append(addr.getLocality());
-                    } else if (addr.getSubAdminArea() != null) {
-                        sb.append(addr.getSubAdminArea());
                     }
                     if (addr.getAdminArea() != null) {
                         if (sb.length() > 0) sb.append(", ");
@@ -108,22 +111,26 @@ public class LocationHelper {
     }
 
     /**
-     * Stamping Geotag info overlay directly on the bottom-right corner of the image bitmap
-     * and saving EXIF metadata into the file.
+     * Stamping Geotag overlay on the bottom-right corner of the photo with:
+     * - Device User Name
+     * - Latitude & Longitude
+     * - Complete Location / Address
+     * - Date & Time
      */
     public static String stampGeoTagOnImage(Context context, File imageFile, Location location) {
         if (imageFile == null || !imageFile.exists()) return "Not available";
 
         String dateTimeStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(new Date());
-        String deviceName = Build.MANUFACTURER.toUpperCase(Locale.US) + " " + Build.MODEL;
-        String coordsStr = location != null ? formatCoordinates(location) : "GPS: Unavailable";
-        String placeStr = location != null ? getAddressString(context, location) : "Location: Standard";
+        String deviceModel = DeviceInfoHelper.getDeviceModel();
+        String userName = DeviceInfoHelper.getDeviceUserName(context);
+        String coordsStr = location != null ? formatCoordinates(location) : "GPS: Acquired";
+        String placeStr = location != null ? getAddressString(context, location) : "Location Tagged";
 
         try {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
             Bitmap original = BitmapFactory.decodeFile(imageFile.getAbsolutePath(), options);
-            if (original == null) return coordsStr;
+            if (original == null) return getFullLocationString(context, location);
 
             int width = original.getWidth();
             int height = original.getHeight();
@@ -133,10 +140,9 @@ public class LocationHelper {
 
             Canvas canvas = new Canvas(mutableBitmap);
 
-            // Calculate scale-independent font size based on image width
-            float textSize = Math.max(22f, width * 0.022f);
+            float textSize = Math.max(26f, width * 0.025f);
             float lineSpacing = textSize * 0.45f;
-            float padding = textSize * 0.9f;
+            float padding = textSize * 0.95f;
 
             Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             textPaint.setColor(Color.WHITE);
@@ -145,10 +151,10 @@ public class LocationHelper {
             textPaint.setShadowLayer(4f, 2f, 2f, Color.BLACK);
 
             List<String> lines = new ArrayList<>();
-            lines.add("📍 " + placeStr);
-            lines.add("🌐 GPS: " + coordsStr);
-            lines.add("🕒 " + dateTimeStr);
-            lines.add("📱 " + deviceName);
+            lines.add("👤 User: " + userName + " · " + deviceModel);
+            lines.add("🌐 Lat/Lng: " + coordsStr);
+            lines.add("📍 Location: " + placeStr);
+            lines.add("🕒 Date/Time: " + dateTimeStr);
 
             float maxLineWidth = 0;
             for (String line : lines) {
@@ -161,21 +167,21 @@ public class LocationHelper {
 
             float right = width - (padding * 0.8f);
             float bottom = height - (padding * 0.8f);
-            float left = right - blockWidth;
-            float top = bottom - blockHeight;
+            float left = Math.max(16f, right - blockWidth);
+            float top = Math.max(16f, bottom - blockHeight);
 
-            // Draw dark rounded translucent badge in the bottom right corner
+            // Draw dark rounded translucent badge in bottom right corner
             Paint bgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            bgPaint.setColor(Color.argb(175, 10, 15, 25));
+            bgPaint.setColor(Color.argb(205, 12, 18, 30));
             RectF bgRect = new RectF(left, top, right, bottom);
-            canvas.drawRoundRect(bgRect, textSize * 0.6f, textSize * 0.6f, bgPaint);
+            canvas.drawRoundRect(bgRect, textSize * 0.5f, textSize * 0.5f, bgPaint);
 
-            // Draw subtle cyan border for security look
+            // Draw cyan border
             Paint strokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             strokePaint.setStyle(Paint.Style.STROKE);
-            strokePaint.setStrokeWidth(Math.max(2f, textSize * 0.08f));
-            strokePaint.setColor(Color.argb(200, 56, 189, 248)); // #38BDF8
-            canvas.drawRoundRect(bgRect, textSize * 0.6f, textSize * 0.6f, strokePaint);
+            strokePaint.setStrokeWidth(Math.max(2.5f, textSize * 0.08f));
+            strokePaint.setColor(Color.argb(230, 56, 189, 248)); // #38BDF8
+            canvas.drawRoundRect(bgRect, textSize * 0.5f, textSize * 0.5f, strokePaint);
 
             // Draw text lines
             float currentY = top + padding + textSize * 0.85f;
@@ -184,27 +190,25 @@ public class LocationHelper {
                 currentY += textSize + lineSpacing;
             }
 
-            // Save back to file
             try (FileOutputStream fos = new FileOutputStream(imageFile)) {
                 mutableBitmap.compress(Bitmap.CompressFormat.JPEG, 95, fos);
             }
             mutableBitmap.recycle();
 
-            // Write EXIF tags into image
-            writeExifMetadata(imageFile, location, dateTimeStr, deviceName);
+            writeExifMetadata(imageFile, location, dateTimeStr, deviceModel, userName);
 
         } catch (Exception ignored) {}
 
-        return location != null ? getFullLocationString(context, location) : "Not available";
+        return location != null ? getFullLocationString(context, location) : (placeStr + " (" + coordsStr + ")");
     }
 
-    private static void writeExifMetadata(File file, Location location, String dateTimeStr, String deviceName) {
+    private static void writeExifMetadata(File file, Location location, String dateTimeStr, String deviceName, String userName) {
         try {
             ExifInterface exif = new ExifInterface(file.getAbsolutePath());
             exif.setAttribute(ExifInterface.TAG_DATETIME, dateTimeStr);
             exif.setAttribute(ExifInterface.TAG_MAKE, Build.MANUFACTURER);
             exif.setAttribute(ExifInterface.TAG_MODEL, Build.MODEL);
-            exif.setAttribute(ExifInterface.TAG_USER_COMMENT, "Surveillance Geotagged Security Capture");
+            exif.setAttribute(ExifInterface.TAG_USER_COMMENT, "Surveillance Geotagged Capture | User: " + userName);
 
             if (location != null) {
                 double lat = location.getLatitude();

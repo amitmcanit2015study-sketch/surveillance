@@ -1148,59 +1148,6 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Section 5: About (Matching Screenshot #1) -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:text="@string/settings_section_about"
-                        android:textColor="?attr/colorPrimary"
-                        android:textSize="14sp"
-                        android:textStyle="bold" />
-
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        app:cardBackgroundColor="?attr/colorSurface"
-                        app:cardCornerRadius="16dp"
-                        app:cardElevation="1dp"
-                        app:strokeColor="?attr/colorOutlineVariant"
-                        app:strokeWidth="1dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="16dp">
-
-                            <Button
-                                android:id="@+id/btnOpenAbout"
-                                style="@style/Widget.Material3.Button.TonalButton"
-                                android:layout_width="match_parent"
-                                android:layout_height="48dp"
-                                android:backgroundTint="#0E4E6B"
-                                android:text="About Surveillance"
-                                android:textColor="#FFFFFF"
-                                app:cornerRadius="24dp"
-                                app:icon="@drawable/ic_security_shield"
-                                app:iconTint="#FFFFFF" />
-
-                            <Button
-                                android:id="@+id/btnShareAppSetting"
-                                style="@style/Widget.Material3.Button.OutlinedButton"
-                                android:layout_width="match_parent"
-                                android:layout_height="48dp"
-                                android:layout_marginTop="10dp"
-                                android:text="@string/share_app"
-                                android:textColor="#E2E8F0"
-                                app:cornerRadius="24dp"
-                                app:icon="@drawable/ic_share"
-                                app:iconTint="#E2E8F0"
-                                app:strokeColor="#3F3F46" />
-                        </LinearLayout>
-                    </com.google.android.material.card.MaterialCardView>
-
                 </LinearLayout>
             </ScrollView>
 

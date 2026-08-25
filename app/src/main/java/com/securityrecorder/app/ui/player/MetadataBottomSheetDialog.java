@@ -10,10 +10,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.securityrecorder.app.data.model.VideoItem;
 import com.securityrecorder.app.databinding.BottomSheetMetadataBinding;
 import com.securityrecorder.app.utils.DateTimeUtils;
+import com.securityrecorder.app.utils.DeviceInfoHelper;
 import com.securityrecorder.app.utils.FileUtils;
 
 /**
- * Bottom sheet displaying full EXIF, location coordinates, codec, file size, and recording metadata.
+ * Bottom sheet displaying full EXIF, location coordinates & address, device model, OS version,
+ * device owner username, mobile SIM details, codec, and file size metadata.
  */
 public class MetadataBottomSheetDialog extends BottomSheetDialogFragment {
 
@@ -48,7 +50,7 @@ public class MetadataBottomSheetDialog extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (videoItem != null) {
+        if (videoItem != null && getContext() != null) {
             binding.tvMetaFilename.setText(videoItem.getTitle());
             binding.tvMetaDate.setText(DateTimeUtils.formatDisplayDate(videoItem.getTimestamp()));
 
@@ -56,7 +58,7 @@ public class MetadataBottomSheetDialog extends BottomSheetDialogFragment {
             if (videoItem.isAudio()) {
                 typeStr = "Audio Recording (M4A)";
             } else if (videoItem.isImage()) {
-                typeStr = "Photo / Image";
+                typeStr = "Photo / Image (JPEG)";
             }
             binding.tvMetaType.setText(typeStr);
             binding.tvMetaVault.setText(videoItem.isVault() ? "🔒 Protected in Vault" : "Standard Archive");
@@ -71,6 +73,13 @@ public class MetadataBottomSheetDialog extends BottomSheetDialogFragment {
             binding.tvMetaResolution.setText(videoItem.getResolution() != null ? videoItem.getResolution() : "1080p");
             binding.tvMetaCodec.setText(videoItem.getCodec() != null ? videoItem.getCodec() : "video/mp4");
             binding.tvMetaLocation.setText(videoItem.getLocation() != null ? videoItem.getLocation() : "Not available");
+
+            // Comprehensive Device, OS, User, and SIM info
+            binding.tvMetaDevice.setText(DeviceInfoHelper.getDeviceModel());
+            binding.tvMetaOsVersion.setText(DeviceInfoHelper.getOsVersion());
+            binding.tvMetaUserName.setText(DeviceInfoHelper.getDeviceUserName(getContext()));
+            binding.tvMetaSimInfo.setText(DeviceInfoHelper.getSimInfo(getContext()));
+
             binding.tvMetaPath.setText(videoItem.getFilePath());
         }
 

@@ -138,8 +138,8 @@ public class MainViewModel extends AndroidViewModel {
         });
     }
 
-    public void insertPhoto(File photoFile, Runnable onComplete) {
-        repository.insertRecordedMedia(photoFile, "Photo", "Not available", "image/jpeg", 0, "image");
+    public void insertPhoto(File photoFile, String locationStr, Runnable onComplete) {
+        repository.insertRecordedMedia(photoFile, "Photo", locationStr != null ? locationStr : "Not available", "image/jpeg", 0, "image");
         if (onComplete != null) onComplete.run();
     }
 

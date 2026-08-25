@@ -62,6 +62,9 @@ public interface VideoRecordDao {
     @Query("UPDATE video_records SET isFavorite = :isFavorite WHERE id = :id")
     void updateFavorite(long id, boolean isFavorite);
 
+    @Query("UPDATE video_records SET isFavorite = :isFavorite WHERE id = :id OR filePath = :filePath")
+    void updateFavoriteByPathOrId(long id, String filePath, boolean isFavorite);
+
     @Query("UPDATE video_records SET isVault = :isVault, filePath = :newPath, uriString = :newUri WHERE id = :id")
     void updateVaultStatus(long id, boolean isVault, String newPath, String newUri);
 

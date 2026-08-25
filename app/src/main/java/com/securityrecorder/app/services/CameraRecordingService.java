@@ -174,7 +174,14 @@ public class CameraRecordingService extends LifecycleService {
         String filename = DateTimeUtils.generateVideoFilename();
         currentOutputFile = new File(recDir, filename);
 
-        FileOutputOptions outputOptions = new FileOutputOptions.Builder(currentOutputFile).build();
+        FileOutputOptions.Builder outputOptionsBuilder = new FileOutputOptions.Builder(currentOutputFile);
+        if (preferences.isLocationEnabled()) {
+            Location loc = LocationHelper.getLastKnownLocation(this);
+            if (loc != null) {
+                outputOptionsBuilder.setLocation(loc);
+            }
+        }
+        FileOutputOptions outputOptions = outputOptionsBuilder.build();
 
         try {
             PendingRecording pendingRecording = videoCapture.getOutput().prepareRecording(this, outputOptions);
@@ -222,10 +229,10 @@ public class CameraRecordingService extends LifecycleService {
 
         if (!event.hasError() && currentOutputFile != null && currentOutputFile.exists() && currentOutputFile.length() > 1024) {
             long duration = System.currentTimeMillis() - recordingStartTime;
-            String locationStr = "Unknown";
+            String locationStr = "Not available";
             if (preferences.isLocationEnabled()) {
                 Location loc = LocationHelper.getLastKnownLocation(this);
-                locationStr = LocationHelper.formatCoordinates(loc);
+                locationStr = LocationHelper.getFullLocationString(this, loc);
             }
             repository.insertRecordedVideo(currentOutputFile, preferences.getResolution(), locationStr, "video/mp4", duration);
         } else {

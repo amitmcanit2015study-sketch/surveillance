@@ -166,6 +166,12 @@ public class VideoRepository {
                 if (durationMs > 0) {
                     existing.setDurationMs(durationMs);
                 }
+                if (location != null && !location.equals("Not available")) {
+                    existing.setLocation(location);
+                }
+                if (resolution != null && !resolution.equals("1080p")) {
+                    existing.setResolution(resolution);
+                }
                 existing.setSizeBytes(file.length());
                 videoRecordDao.update(existing);
                 return;
@@ -199,7 +205,7 @@ public class VideoRepository {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             boolean newStatus = !item.isFavorite();
             item.setFavorite(newStatus);
-            videoRecordDao.updateFavorite(item.getId(), newStatus);
+            videoRecordDao.updateFavoriteByPathOrId(item.getId(), item.getFilePath(), newStatus);
         });
     }
 
@@ -209,7 +215,7 @@ public class VideoRepository {
                 for (VideoItem item : items) {
                     boolean newStatus = !item.isFavorite();
                     item.setFavorite(newStatus);
-                    videoRecordDao.updateFavorite(item.getId(), newStatus);
+                    videoRecordDao.updateFavoriteByPathOrId(item.getId(), item.getFilePath(), newStatus);
                 }
             }
             if (onComplete != null) {

@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.os.PowerManager;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
+import com.securityrecorder.app.data.preferences.AppPreferences;
 import com.securityrecorder.app.data.repository.VideoRepository;
 import com.securityrecorder.app.utils.DateTimeUtils;
 import com.securityrecorder.app.utils.FileUtils;
@@ -147,12 +148,19 @@ public class AudioRecordingService extends Service {
 
         if (currentOutputFile != null && currentOutputFile.exists() && currentOutputFile.length() > 512) {
             long duration = System.currentTimeMillis() - recordingStartTime;
-            new VideoRepository(getApplication()).insertRecordedVideo(
+            String locationStr = "Not available";
+            AppPreferences preferences = new AppPreferences(this);
+            if (preferences.isLocationEnabled()) {
+                android.location.Location loc = com.securityrecorder.app.utils.LocationHelper.getLastKnownLocation(this);
+                locationStr = com.securityrecorder.app.utils.LocationHelper.getFullLocationString(this, loc);
+            }
+            new VideoRepository(getApplication()).insertRecordedMedia(
                     currentOutputFile,
                     "Audio (M4A)",
-                    "Not available",
+                    locationStr,
                     "audio/mp4a-latm",
-                    duration
+                    duration,
+                    "audio"
             );
         } else if (currentOutputFile != null && currentOutputFile.exists()) {
             FileUtils.deleteFile(currentOutputFile.getAbsolutePath());
