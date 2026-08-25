@@ -230,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
         viewModel.syncStorage();
         updateSettingsUiValues();
         updateGeoTagButtonUi();
+        updateCameraLensButtonUi();
     }
 
     private void checkAppSecurityLock() {
@@ -332,6 +333,7 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
 
     private void setupHomeTab() {
         updateGeoTagButtonUi();
+        updateCameraLensButtonUi();
 
         // GeoTag Toggle Button
         binding.btnToggleGeoTag.setOnClickListener(v -> {
@@ -353,6 +355,15 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
                 updateGeoTagButtonUi();
                 Toast.makeText(this, "GPS Geo-Tagging Disabled", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        // Front / Rear Camera Lens Toggle Button
+        binding.btnToggleCameraLens.setOnClickListener(v -> {
+            HapticUtils.performClickFeedback(this);
+            boolean willBeFront = !preferences.isFrontCamera();
+            preferences.setFrontCamera(willBeFront);
+            updateCameraLensButtonUi();
+            Toast.makeText(this, willBeFront ? "Switched to Front Camera" : "Switched to Rear Camera", Toast.LENGTH_SHORT).show();
         });
 
         // Video Preview Toggle Button (appears when video is recording)
@@ -422,6 +433,12 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
         boolean isGps = preferences.isLocationEnabled();
         binding.btnToggleGeoTag.setText(isGps ? "Geo-Tag: ON" : "Geo-Tag: OFF");
         binding.btnToggleGeoTag.setTextColor(isGps ? 0xFF38BDF8 : 0xFFA1A1AA);
+    }
+
+    private void updateCameraLensButtonUi() {
+        boolean isFront = preferences.isFrontCamera();
+        binding.btnToggleCameraLens.setText(isFront ? "Cam: Front" : "Cam: Rear");
+        binding.btnToggleCameraLens.setTextColor(isFront ? 0xFFF59E0B : 0xFF38BDF8);
     }
 
     // --- Tab 2: Files Screen ---

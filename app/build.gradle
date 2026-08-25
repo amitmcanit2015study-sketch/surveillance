@@ -40,6 +40,12 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "survilance_app.apk"
+        }
+    }
 }
 
 dependencies {

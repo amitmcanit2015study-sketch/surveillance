@@ -314,7 +314,7 @@
                     android:gravity="center_horizontal"
                     android:orientation="vertical">
 
-                    <!-- Auxiliary Buttons Row (GeoTag & Video Preview toggle) -->
+                    <!-- Auxiliary Buttons Row (GeoTag, Camera Lens & Video Preview toggle) -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -328,11 +328,24 @@
                             style="@style/Widget.Material3.Button.TonalButton"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
-                            android:layout_marginEnd="12dp"
-                            android:paddingHorizontal="12dp"
+                            android:layout_marginEnd="8dp"
+                            android:paddingHorizontal="10dp"
                             android:text="Geo-Tag: OFF"
                             android:textSize="11sp"
                             app:icon="@drawable/ic_gps"
+                            app:iconSize="16dp" />
+
+                        <!-- Front / Rear Camera Selection Button -->
+                        <Button
+                            android:id="@+id/btnToggleCameraLens"
+                            style="@style/Widget.Material3.Button.TonalButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="8dp"
+                            android:paddingHorizontal="10dp"
+                            android:text="Cam: Rear"
+                            android:textSize="11sp"
+                            app:icon="@drawable/ic_camera_flip"
                             app:iconSize="16dp" />
 
                         <!-- Camera Preview Toggle Button (Populates when video recording is active) -->
@@ -341,7 +354,7 @@
                             style="@style/Widget.Material3.Button.TonalButton"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
-                            android:paddingHorizontal="12dp"
+                            android:paddingHorizontal="10dp"
                             android:text="Show Preview"
                             android:textSize="11sp"
                             android:visibility="gone"
