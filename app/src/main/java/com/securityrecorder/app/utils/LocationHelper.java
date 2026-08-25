@@ -62,13 +62,28 @@ public class LocationHelper {
     }
 
     public static String getFullLocationString(Context context, Location location) {
-        if (location == null) return "Not available";
-        String coords = formatCoordinates(location);
-        String address = getAddressString(context, location);
-        if (!address.isEmpty() && !address.equals(coords)) {
-            return address + " (" + coords + ")";
+        if (location != null) {
+            String coords = formatCoordinates(location);
+            String address = getAddressString(context, location);
+            String fullStr;
+            if (!address.isEmpty() && !address.equals(coords)) {
+                fullStr = address + " (" + coords + ")";
+            } else {
+                fullStr = coords;
+            }
+            if (context != null) {
+                new com.securityrecorder.app.data.preferences.AppPreferences(context).setCachedLocation(fullStr);
+            }
+            return fullStr;
         }
-        return coords;
+
+        if (context != null) {
+            String cached = new com.securityrecorder.app.data.preferences.AppPreferences(context).getCachedLocation();
+            if (cached != null && !cached.trim().isEmpty() && !cached.equals("Not available")) {
+                return cached;
+            }
+        }
+        return "Not available";
     }
 
     public static String getAddressString(Context context, Location location) {

@@ -12,8 +12,10 @@ import com.securityrecorder.app.data.local.VideoRecordDao;
 import com.securityrecorder.app.data.local.VideoRecordEntity;
 import com.securityrecorder.app.data.model.FilterType;
 import com.securityrecorder.app.data.model.VideoItem;
+import com.securityrecorder.app.data.preferences.AppPreferences;
 import com.securityrecorder.app.utils.DateTimeUtils;
 import com.securityrecorder.app.utils.FileUtils;
+import com.securityrecorder.app.utils.LocationHelper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,6 +74,11 @@ public class VideoRepository {
                 VideoRecordEntity existing = videoRecordDao.findByFilePath(file.getAbsolutePath());
                 if (existing == null) {
                     VideoItem parsed = FileUtils.extractMetadata(application, file);
+                    String location = parsed.getLocation();
+                    if ((location == null || location.equals("Not available")) && new AppPreferences(application).isLocationEnabled()) {
+                        android.location.Location loc = LocationHelper.getLastKnownLocation(application);
+                        location = LocationHelper.getFullLocationString(application, loc);
+                    }
                     VideoRecordEntity entity = new VideoRecordEntity(
                             file.getName(),
                             file.getAbsolutePath(),
@@ -81,12 +88,19 @@ public class VideoRepository {
                             file.length(),
                             false,
                             parsed.getResolution(),
-                            parsed.getLocation(),
+                            location,
                             parsed.getCodec(),
                             isVault,
                             parsed.getMediaType()
                     );
                     videoRecordDao.insert(entity);
+                } else if ((existing.getLocation() == null || existing.getLocation().equals("Not available")) && new AppPreferences(application).isLocationEnabled()) {
+                    android.location.Location loc = LocationHelper.getLastKnownLocation(application);
+                    String locStr = LocationHelper.getFullLocationString(application, loc);
+                    if (!locStr.equals("Not available")) {
+                        existing.setLocation(locStr);
+                        videoRecordDao.update(existing);
+                    }
                 }
             }
         }

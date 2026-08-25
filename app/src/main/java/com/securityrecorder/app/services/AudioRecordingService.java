@@ -146,8 +146,8 @@ public class AudioRecordingService extends Service {
             mediaRecorder = null;
         }
 
-        if (currentOutputFile != null && currentOutputFile.exists() && currentOutputFile.length() > 512) {
-            long duration = System.currentTimeMillis() - recordingStartTime;
+        if (currentOutputFile != null && currentOutputFile.exists() && currentOutputFile.length() > 0) {
+            long duration = Math.max(1000L, System.currentTimeMillis() - recordingStartTime);
             String locationStr = "Not available";
             AppPreferences preferences = new AppPreferences(this);
             if (preferences.isLocationEnabled()) {

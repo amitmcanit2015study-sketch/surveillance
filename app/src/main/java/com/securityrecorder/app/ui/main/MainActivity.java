@@ -1169,7 +1169,7 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
 
     private void startRecordingService() {
         HapticUtils.performRecordingStartFeedback(this);
-        CameraRecordingService.previewViewRef = binding.smallPreviewView;
+        CameraRecordingService.previewViewRef = isSmallPreviewVisible ? binding.smallPreviewView : null;
         Intent serviceIntent = new Intent(this, CameraRecordingService.class);
         serviceIntent.setAction(CameraRecordingService.ACTION_START);
         ContextCompat.startForegroundService(this, serviceIntent);

@@ -34,6 +34,9 @@ public class AppPreferences {
     private static final String KEY_VOLUME_SHUTTER = "pref_volume_shutter";
     private static final String KEY_MOTION_DETECTION = "pref_motion_detection";
     private static final String KEY_GRID_OVERLAY = "pref_grid_overlay";
+    private static final String KEY_CACHED_LAT = "pref_cached_lat";
+    private static final String KEY_CACHED_LON = "pref_cached_lon";
+    private static final String KEY_CACHED_LOC_STR = "pref_cached_loc_str";
 
     private final SharedPreferences prefs;
 
@@ -75,6 +78,16 @@ public class AppPreferences {
 
     public void setLocationEnabled(boolean enabled) {
         prefs.edit().putBoolean(KEY_LOCATION_ENABLED, enabled).apply();
+    }
+
+    public void setCachedLocation(String locStr) {
+        if (locStr != null && !locStr.equals("Not available")) {
+            prefs.edit().putString(KEY_CACHED_LOC_STR, locStr).apply();
+        }
+    }
+
+    public String getCachedLocation() {
+        return prefs.getString(KEY_CACHED_LOC_STR, null);
     }
 
     // Camera facing (true for front, false for back)

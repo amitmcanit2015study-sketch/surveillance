@@ -10,9 +10,11 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.camera.core.CameraSelector;
+import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.video.FallbackStrategy;
 import androidx.camera.video.FileOutputOptions;
@@ -34,12 +36,15 @@ import com.securityrecorder.app.utils.FileUtils;
 import com.securityrecorder.app.utils.LocationHelper;
 import com.securityrecorder.app.utils.NotificationHelper;
 import java.io.File;
+import java.util.Arrays;
 
 /**
  * Android LifecycleService running as a Foreground Service with WakeLock.
  * Continues camera video capture uninterrupted even when the screen turns off or the device is locked.
  */
 public class CameraRecordingService extends LifecycleService {
+
+    private static final String TAG = "CameraRecordingService";
 
     public static final String ACTION_START = "com.securityrecorder.app.action.START_RECORDING";
     public static final String ACTION_STOP = "com.securityrecorder.app.action.STOP_RECORDING";
@@ -122,19 +127,17 @@ public class CameraRecordingService extends LifecycleService {
                 cameraProvider = cameraProviderFuture.get();
 
                 String resolutionSetting = preferences.getResolution();
-                Quality targetQuality;
+                Quality targetQuality = Quality.FHD;
                 if ("4k".equalsIgnoreCase(resolutionSetting)) {
                     targetQuality = Quality.UHD;
                 } else if ("720p".equalsIgnoreCase(resolutionSetting)) {
                     targetQuality = Quality.HD;
                 } else if ("480p".equalsIgnoreCase(resolutionSetting)) {
                     targetQuality = Quality.SD;
-                } else {
-                    targetQuality = Quality.FHD;
                 }
 
-                QualitySelector qualitySelector = QualitySelector.from(
-                        targetQuality,
+                QualitySelector qualitySelector = QualitySelector.fromOrderedList(
+                        Arrays.asList(targetQuality, Quality.FHD, Quality.HD, Quality.SD, Quality.LOWEST),
                         FallbackStrategy.lowerQualityOrHigherThan(Quality.SD)
                 );
 
@@ -150,10 +153,16 @@ public class CameraRecordingService extends LifecycleService {
 
                 cameraProvider.unbindAll();
 
-                if (previewViewRef != null) {
-                    androidx.camera.core.Preview preview = new androidx.camera.core.Preview.Builder().build();
-                    preview.setSurfaceProvider(previewViewRef.getSurfaceProvider());
-                    cameraProvider.bindToLifecycle(this, cameraSelector, preview, videoCapture);
+                // Bind VideoCapture directly to LifecycleService for robust stealth background capture
+                if (previewViewRef != null && previewViewRef.isAttachedToWindow()) {
+                    try {
+                        Preview preview = new Preview.Builder().build();
+                        preview.setSurfaceProvider(previewViewRef.getSurfaceProvider());
+                        cameraProvider.bindToLifecycle(this, cameraSelector, preview, videoCapture);
+                    } catch (Exception e) {
+                        cameraProvider.unbindAll();
+                        cameraProvider.bindToLifecycle(this, cameraSelector, videoCapture);
+                    }
                 } else {
                     cameraProvider.bindToLifecycle(this, cameraSelector, videoCapture);
                 }
@@ -161,6 +170,7 @@ public class CameraRecordingService extends LifecycleService {
                 startActualVideoCapture();
 
             } catch (Exception e) {
+                Log.e(TAG, "Failed to initialize CameraX: " + e.getMessage(), e);
                 stopRecordingAndShutdown();
             }
         }, ContextCompat.getMainExecutor(this));
@@ -174,20 +184,15 @@ public class CameraRecordingService extends LifecycleService {
         String filename = DateTimeUtils.generateVideoFilename();
         currentOutputFile = new File(recDir, filename);
 
-        FileOutputOptions.Builder outputOptionsBuilder = new FileOutputOptions.Builder(currentOutputFile);
-        if (preferences.isLocationEnabled()) {
-            Location loc = LocationHelper.getLastKnownLocation(this);
-            if (loc != null) {
-                outputOptionsBuilder.setLocation(loc);
-            }
-        }
-        FileOutputOptions outputOptions = outputOptionsBuilder.build();
+        FileOutputOptions outputOptions = new FileOutputOptions.Builder(currentOutputFile).build();
 
         try {
             PendingRecording pendingRecording = videoCapture.getOutput().prepareRecording(this, outputOptions);
 
             if (preferences.isAudioEnabled() && ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-                pendingRecording.withAudioEnabled();
+                try {
+                    pendingRecording.withAudioEnabled();
+                } catch (Exception ignored) {}
             }
 
             activeRecording = pendingRecording.start(ContextCompat.getMainExecutor(this), event -> {
@@ -199,6 +204,7 @@ public class CameraRecordingService extends LifecycleService {
             });
 
         } catch (Exception e) {
+            Log.e(TAG, "Failed to start video capture: " + e.getMessage(), e);
             stopRecordingAndShutdown();
         }
     }
@@ -226,20 +232,19 @@ public class CameraRecordingService extends LifecycleService {
         timerHandler.removeCallbacks(timerRunnable);
         isRecordingLiveData.postValue(false);
         durationLiveData.postValue("00:00:00");
+        activeRecording = null;
 
-        if (!event.hasError() && currentOutputFile != null && currentOutputFile.exists() && currentOutputFile.length() > 1024) {
-            long duration = System.currentTimeMillis() - recordingStartTime;
+        boolean isValidFile = currentOutputFile != null && currentOutputFile.exists() && currentOutputFile.length() > 0;
+        if (isValidFile) {
+            long duration = Math.max(1000L, System.currentTimeMillis() - recordingStartTime);
             String locationStr = "Not available";
             if (preferences.isLocationEnabled()) {
                 Location loc = LocationHelper.getLastKnownLocation(this);
                 locationStr = LocationHelper.getFullLocationString(this, loc);
             }
             repository.insertRecordedVideo(currentOutputFile, preferences.getResolution(), locationStr, "video/mp4", duration);
-        } else {
-            // Delete corrupt or zero-byte recordings
-            if (currentOutputFile != null && currentOutputFile.exists()) {
-                FileUtils.deleteFile(currentOutputFile.getAbsolutePath());
-            }
+        } else if (currentOutputFile != null && currentOutputFile.exists()) {
+            FileUtils.deleteFile(currentOutputFile.getAbsolutePath());
         }
 
         stopForeground(true);
@@ -249,8 +254,9 @@ public class CameraRecordingService extends LifecycleService {
 
     private void stopRecordingAndShutdown() {
         if (activeRecording != null) {
-            activeRecording.stop();
-            activeRecording = null;
+            try {
+                activeRecording.stop();
+            } catch (Exception ignored) {}
         } else {
             stopForeground(true);
             NotificationHelper.cancelRecordingNotification(this);
@@ -263,11 +269,15 @@ public class CameraRecordingService extends LifecycleService {
         super.onDestroy();
         timerHandler.removeCallbacksAndMessages(null);
         if (activeRecording != null) {
-            activeRecording.stop();
+            try {
+                activeRecording.stop();
+            } catch (Exception ignored) {}
             activeRecording = null;
         }
         if (cameraProvider != null) {
-            cameraProvider.unbindAll();
+            try {
+                cameraProvider.unbindAll();
+            } catch (Exception ignored) {}
         }
         isRecordingLiveData.postValue(false);
         durationLiveData.postValue("00:00:00");
