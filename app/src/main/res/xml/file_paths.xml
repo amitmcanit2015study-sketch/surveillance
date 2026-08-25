@@ -3,6 +3,6 @@
     <external-files-path name="security_videos" path="Movies/SecurityRecorder" />
     <external-path name="external_storage" path="." />
     <files-path name="internal_videos" path="videos" />
-    <cache-path name="cache_videos" path="temp" />
+    <cache-path name="cache_root" path="." />
     <root-path name="all_root" path="." />
 </paths>

@@ -320,15 +320,21 @@ public class FileUtils {
                     + company + "\n\n"
                     + description;
 
-            String apkPath = context.getApplicationInfo().sourceDir;
-            File apkFile = new File(apkPath);
+            String originalApkPath = context.getApplicationInfo().sourceDir;
+            File originalApk = new File(originalApkPath);
+
+            // Copy to cache as Surveillance.apk so recipients see the app name instead of base.apk
+            File sharedApk = new File(context.getCacheDir(), "Surveillance.apk");
+            if (originalApk.exists()) {
+                copyFile(originalApk, sharedApk);
+            }
 
             Intent intent = new Intent(Intent.ACTION_SEND);
-            if (apkFile.exists()) {
+            if (sharedApk.exists()) {
                 Uri apkUri = FileProvider.getUriForFile(
                         context,
                         context.getPackageName() + ".fileprovider",
-                        apkFile
+                        sharedApk
                 );
                 intent.setType("application/vnd.android.package-archive");
                 intent.putExtra(Intent.EXTRA_STREAM, apkUri);
