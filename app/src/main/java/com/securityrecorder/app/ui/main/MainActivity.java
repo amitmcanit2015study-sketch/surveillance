@@ -710,6 +710,12 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
                 Toast.makeText(this, "Clipboard is empty", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // About & Information
+        binding.rowAboutApp.setOnClickListener(v -> {
+            HapticUtils.performClickFeedback(this);
+            startActivity(new Intent(this, com.securityrecorder.app.ui.common.AboutActivity.class));
+        });
     }
 
     private void updateSettingsUiValues() {
