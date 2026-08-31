@@ -309,6 +309,8 @@ public class FileUtils {
         context.startActivity(Intent.createChooser(intent, "Share " + uris.size() + " Item(s)"));
     }
 
+    public static final String APK_FILE_NAME = "survillance-amit-bharat.apk";
+
     public static void shareApp(Context context) {
         try {
             String appName = context.getString(com.securityrecorder.app.R.string.app_name);
@@ -323,8 +325,8 @@ public class FileUtils {
             String originalApkPath = context.getApplicationInfo().sourceDir;
             File originalApk = new File(originalApkPath);
 
-            // Copy to cache as Surveillance.apk so recipients see the app name instead of base.apk
-            File sharedApk = new File(context.getCacheDir(), "Surveillance.apk");
+            // Copy to cache as survillance-amit-bharat.apk so recipients see the intended name
+            File sharedApk = new File(context.getCacheDir(), APK_FILE_NAME);
             if (originalApk.exists()) {
                 copyFile(originalApk, sharedApk);
             }
@@ -353,5 +355,70 @@ public class FileUtils {
             intent.putExtra(Intent.EXTRA_TEXT, context.getString(com.securityrecorder.app.R.string.about_description));
             context.startActivity(Intent.createChooser(intent, "Share App"));
         }
+    }
+
+    /**
+     * Downloads / saves the application APK as survillance-amit-bharat.apk into the public Downloads directory.
+     *
+     * @param context Application context
+     * @return Saved File destination or null on failure
+     */
+    public static File downloadApk(Context context) {
+        try {
+            String originalApkPath = context.getApplicationInfo().sourceDir;
+            File originalApk = new File(originalApkPath);
+            if (!originalApk.exists()) {
+                return null;
+            }
+
+            // For Android 10+ (API 29+) using MediaStore Downloads
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                android.content.ContentValues values = new android.content.ContentValues();
+                values.put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, APK_FILE_NAME);
+                values.put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "application/vnd.android.package-archive");
+                values.put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+
+                android.content.ContentResolver resolver = context.getContentResolver();
+                Uri uri = resolver.insert(android.provider.MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+
+                if (uri != null) {
+                    try (InputStream in = new FileInputStream(originalApk);
+                         OutputStream out = resolver.openOutputStream(uri)) {
+                        if (out != null) {
+                            byte[] buf = new byte[8192];
+                            int len;
+                            while ((len = in.read(buf)) > 0) {
+                                out.write(buf, 0, len);
+                            }
+                            out.flush();
+                        }
+                    }
+                    File publicDownloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                    return new File(publicDownloads, APK_FILE_NAME);
+                }
+            }
+
+            // Direct file copy to public Downloads directory
+            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            if (!downloadsDir.exists()) {
+                downloadsDir.mkdirs();
+            }
+            File targetFile = new File(downloadsDir, APK_FILE_NAME);
+            if (copyFile(originalApk, targetFile)) {
+                return targetFile;
+            }
+
+            // Fallback to app external files / cache
+            File externalDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+            if (externalDir != null) {
+                File fallbackFile = new File(externalDir, APK_FILE_NAME);
+                if (copyFile(originalApk, fallbackFile)) {
+                    return fallbackFile;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

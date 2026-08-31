@@ -6,10 +6,13 @@
     <string name="company_name">Company: Rooys Soft Tech</string>
     <string name="company_email">rooyssofttech2020@gmail.com</string>
     <string name="app_version_name">v1.0.0 (Production Build)</string>
-    <string name="about_description">Surveillance is a free, ad-free gallery and security camera manager designed for a fast, simple, and seamless experience. Easily organize, browse, and manage your recordings and files with a clean interface, smooth performance, and privacy at its core.</string>
+    <string name="about_description">Surveillance is a free, ad-free surveillance and security recording manager designed for a fast, simple, and seamless experience. Easily capture, browse, and manage your recordings with a clean interface, smooth performance, and privacy at its core.</string>
     <string name="header_title">Surveillance</string>
-    <string name="share_app">Share App</string>
-    <string name="share_app_description">Share Gallery with friends and family (Description &amp; APK)</string>
+    <string name="share_app">Share APK</string>
+    <string name="download_apk">Download APK</string>
+    <string name="send_feedback">Send Feedback</string>
+    <string name="about_footer">100% Offline • No Ads • Zero Tracking</string>
+    <string name="share_app_description">Share Surveillance with friends and family (Description &amp; APK)</string>
 
     <!-- Navigation and Menu -->
     <string name="menu_toggle_grid">Switch to Grid</string>

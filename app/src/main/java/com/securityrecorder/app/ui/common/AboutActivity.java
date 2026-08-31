@@ -32,6 +32,20 @@ public class AboutActivity extends AppCompatActivity {
             FileUtils.shareApp(this);
         });
 
+        binding.btnAboutDownloadApk.setOnClickListener(v -> {
+            HapticUtils.performClickFeedback(this);
+            try {
+                java.io.File downloaded = FileUtils.downloadApk(this);
+                if (downloaded != null) {
+                    android.widget.Toast.makeText(this, "Saved " + FileUtils.APK_FILE_NAME + " to Downloads", android.widget.Toast.LENGTH_LONG).show();
+                } else {
+                    android.widget.Toast.makeText(this, "APK download completed", android.widget.Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception e) {
+                android.widget.Toast.makeText(this, "Could not save APK: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+            }
+        });
+
         binding.btnSendFeedback.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
             try {
