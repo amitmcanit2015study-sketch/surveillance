@@ -50,37 +50,43 @@ public class MetadataBottomSheetDialog extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (videoItem != null && getContext() != null) {
-            binding.tvMetaFilename.setText(videoItem.getTitle());
-            binding.tvMetaDate.setText(DateTimeUtils.formatDisplayDate(videoItem.getTimestamp()));
+        try {
+            if (videoItem != null && getContext() != null) {
+                binding.tvMetaFilename.setText(videoItem.getTitle() != null ? videoItem.getTitle() : "Recording");
+                binding.tvMetaDate.setText(DateTimeUtils.formatDisplayDate(videoItem.getTimestamp()));
 
-            String typeStr = "Video Recording";
-            if (videoItem.isAudio()) {
-                typeStr = "Audio Recording (M4A)";
-            } else if (videoItem.isImage()) {
-                typeStr = "Photo / Image (JPEG)";
+                String typeStr = "Video Recording";
+                if (videoItem.isAudio()) {
+                    typeStr = "Audio Recording (M4A)";
+                } else if (videoItem.isImage()) {
+                    typeStr = "Photo / Image (JPEG)";
+                }
+                binding.tvMetaType.setText(typeStr);
+                binding.tvMetaVault.setText(videoItem.isVault() ? "🔒 Protected in Vault" : "Standard Archive");
+
+                if (videoItem.isImage()) {
+                    binding.tvMetaDuration.setText("N/A (Photo)");
+                } else {
+                    binding.tvMetaDuration.setText(DateTimeUtils.formatDuration(videoItem.getDurationMs()));
+                }
+
+                binding.tvMetaSize.setText(FileUtils.formatFileSize(videoItem.getSizeBytes()) + " (" + videoItem.getSizeBytes() + " bytes)");
+                binding.tvMetaResolution.setText(videoItem.getResolution() != null ? videoItem.getResolution() : "1080p");
+                binding.tvMetaCodec.setText(videoItem.getCodec() != null ? videoItem.getCodec() : (videoItem.isAudio() ? "audio/mp4" : "video/mp4"));
+                binding.tvMetaLocation.setText(videoItem.getLocation() != null ? videoItem.getLocation() : "Not available");
+
+                // Comprehensive Device, OS, User, and SIM info
+                try {
+                    binding.tvMetaDevice.setText(DeviceInfoHelper.getDeviceModel());
+                    binding.tvMetaOsVersion.setText(DeviceInfoHelper.getOsVersion());
+                    binding.tvMetaUserName.setText(DeviceInfoHelper.getDeviceUserName(getContext()));
+                    binding.tvMetaSimInfo.setText(DeviceInfoHelper.getSimInfo(getContext()));
+                } catch (Throwable ignored) {}
+
+                binding.tvMetaPath.setText(videoItem.getFilePath() != null ? videoItem.getFilePath() : "");
             }
-            binding.tvMetaType.setText(typeStr);
-            binding.tvMetaVault.setText(videoItem.isVault() ? "🔒 Protected in Vault" : "Standard Archive");
-
-            if (videoItem.isImage()) {
-                binding.tvMetaDuration.setText("N/A (Photo)");
-            } else {
-                binding.tvMetaDuration.setText(DateTimeUtils.formatDuration(videoItem.getDurationMs()));
-            }
-
-            binding.tvMetaSize.setText(FileUtils.formatFileSize(videoItem.getSizeBytes()) + " (" + videoItem.getSizeBytes() + " bytes)");
-            binding.tvMetaResolution.setText(videoItem.getResolution() != null ? videoItem.getResolution() : "1080p");
-            binding.tvMetaCodec.setText(videoItem.getCodec() != null ? videoItem.getCodec() : "video/mp4");
-            binding.tvMetaLocation.setText(videoItem.getLocation() != null ? videoItem.getLocation() : "Not available");
-
-            // Comprehensive Device, OS, User, and SIM info
-            binding.tvMetaDevice.setText(DeviceInfoHelper.getDeviceModel());
-            binding.tvMetaOsVersion.setText(DeviceInfoHelper.getOsVersion());
-            binding.tvMetaUserName.setText(DeviceInfoHelper.getDeviceUserName(getContext()));
-            binding.tvMetaSimInfo.setText(DeviceInfoHelper.getSimInfo(getContext()));
-
-            binding.tvMetaPath.setText(videoItem.getFilePath());
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
 
         binding.btnCloseMetadata.setOnClickListener(v -> dismiss());

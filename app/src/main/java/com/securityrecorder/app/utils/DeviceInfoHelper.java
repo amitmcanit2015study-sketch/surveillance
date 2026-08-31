@@ -32,6 +32,7 @@ public class DeviceInfoHelper {
     }
 
     public static String getDeviceUserName(Context context) {
+        if (context == null) return "Owner";
         String name = null;
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
@@ -43,36 +44,47 @@ public class DeviceInfoHelper {
             if (name == null || name.trim().isEmpty()) {
                 name = Settings.System.getString(context.getContentResolver(), "device_name");
             }
-        } catch (Exception ignored) {}
+        } catch (Throwable ignored) {}
 
         if (name == null || name.trim().isEmpty()) {
-            name = Build.USER != null && !Build.USER.equalsIgnoreCase("root") ? Build.USER : "Owner";
+            try {
+                name = Build.USER != null && !Build.USER.equalsIgnoreCase("root") ? Build.USER : "Device Owner";
+            } catch (Throwable ignored) {
+                name = "Device Owner";
+            }
         }
         return name;
     }
 
     @SuppressLint({"MissingPermission", "HardwareIds"})
     public static String getSimInfo(Context context) {
+        if (context == null) return "Cellular / Standby";
         StringBuilder sb = new StringBuilder();
         try {
             TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
             if (tm != null) {
-                String operatorName = tm.getNetworkOperatorName();
-                if (operatorName == null || operatorName.isEmpty()) {
-                    operatorName = tm.getSimOperatorName();
-                }
+                String operatorName = null;
+                try {
+                    operatorName = tm.getNetworkOperatorName();
+                    if (operatorName == null || operatorName.isEmpty()) {
+                        operatorName = tm.getSimOperatorName();
+                    }
+                } catch (Throwable ignored) {}
 
-                String country = tm.getNetworkCountryIso();
-                if (country != null && !country.isEmpty()) {
-                    country = country.toUpperCase(Locale.US);
-                }
+                String country = null;
+                try {
+                    country = tm.getNetworkCountryIso();
+                    if (country != null && !country.isEmpty()) {
+                        country = country.toUpperCase(Locale.US);
+                    }
+                } catch (Throwable ignored) {}
 
                 String line1Number = null;
-                boolean hasPhonePerm = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
-                        || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_NUMBERS) == PackageManager.PERMISSION_GRANTED);
+                try {
+                    boolean hasPhonePerm = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
+                            || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_NUMBERS) == PackageManager.PERMISSION_GRANTED);
 
-                if (hasPhonePerm) {
-                    try {
+                    if (hasPhonePerm) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
                             SubscriptionManager sm = (SubscriptionManager) context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
                             if (sm != null) {
@@ -95,13 +107,13 @@ public class DeviceInfoHelper {
                         if (line1Number == null || line1Number.isEmpty()) {
                             line1Number = tm.getLine1Number();
                         }
-                    } catch (Exception ignored) {}
-                }
+                    }
+                } catch (Throwable ignored) {}
 
                 if (operatorName != null && !operatorName.isEmpty()) {
                     sb.append(operatorName);
                 } else {
-                    sb.append("Cellular SIM");
+                    sb.append("SIM Card Active");
                 }
 
                 if (country != null && !country.isEmpty()) {
@@ -112,7 +124,7 @@ public class DeviceInfoHelper {
                     sb.append(" · ").append(line1Number);
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Throwable ignored) {}
 
         return sb.length() > 0 ? sb.toString() : "SIM Card Active";
     }

@@ -114,22 +114,28 @@
     <!-- Info Button -->
     <ImageButton
         android:id="@+id/btnInfo"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="false"
+        android:padding="8dp"
         android:contentDescription="View Metadata"
         android:src="@drawable/ic_info"
-        app:tint="#71717A" />
+        app:tint="#A1A1AA" />
 
     <!-- Favorite Star Button -->
     <ImageButton
         android:id="@+id/btnFavorite"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginStart="2dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="4dp"
         android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="false"
+        android:padding="8dp"
         android:contentDescription="@string/filter_favorites"
         android:src="@drawable/ic_star_outline"
-        app:tint="#71717A" />
+        app:tint="#A1A1AA" />
 
 </LinearLayout>

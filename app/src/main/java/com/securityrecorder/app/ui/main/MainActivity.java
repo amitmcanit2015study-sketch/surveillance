@@ -47,6 +47,7 @@ import com.securityrecorder.app.ui.player.AudioPlayerBottomSheet;
 import com.securityrecorder.app.ui.player.ImageViewerDialog;
 import com.securityrecorder.app.ui.player.MetadataBottomSheetDialog;
 import com.securityrecorder.app.ui.player.VideoPlayerActivity;
+import com.securityrecorder.app.ui.recorder.CameraRecorderActivity;
 import com.securityrecorder.app.utils.FileUtils;
 import com.securityrecorder.app.utils.HapticUtils;
 import com.securityrecorder.app.utils.LocationHelper;
@@ -409,22 +410,14 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
             binding.getRoot().postDelayed(this::checkPermissionsAndCapturePhoto, 200);
         });
 
-        // Video Button
+        // Video Button (Launches Full Live Camera Recorder)
         binding.fabHomeVideo.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
-            Boolean isAudioRec = AudioRecordingService.isAudioRecordingLiveData.getValue();
             Boolean isVideoRec = CameraRecordingService.isRecordingLiveData.getValue();
-
-            if (Boolean.TRUE.equals(isAudioRec)) {
-                // If audio is recording, stop it and start video
-                stopAudioRecordingService();
-                binding.getRoot().postDelayed(this::checkPermissionsAndStartRecording, 300);
-            } else if (Boolean.TRUE.equals(isVideoRec)) {
-                // Stop video recording
+            if (Boolean.TRUE.equals(isVideoRec)) {
                 stopRecordingService();
             } else {
-                // Start video recording
-                checkPermissionsAndStartRecording();
+                startActivity(new Intent(this, CameraRecorderActivity.class));
             }
         });
     }
