@@ -312,7 +312,16 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
 
         binding.btnMenuOverflow.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
-            startActivity(new Intent(this, AboutActivity.class));
+            androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(this, binding.btnMenuOverflow);
+            popup.getMenuInflater().inflate(R.menu.menu_toolbar_overflow, popup.getMenu());
+            popup.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.action_about) {
+                    startActivity(new Intent(this, com.securityrecorder.app.ui.common.AboutActivity.class));
+                    return true;
+                }
+                return false;
+            });
+            popup.show();
         });
     }
 

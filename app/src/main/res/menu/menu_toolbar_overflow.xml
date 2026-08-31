@@ -2,6 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_about"
-        android:icon="@drawable/ic_security_shield"
-        android:title="About" />
+        android:icon="@drawable/ic_info"
+        android:title="@string/action_about" />
 </menu>

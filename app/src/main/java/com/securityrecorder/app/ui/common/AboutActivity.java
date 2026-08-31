@@ -21,7 +21,7 @@ public class AboutActivity extends AppCompatActivity {
             + "• Developed by: Amit Bharat\n"
             + "• Company: Rooys Soft Tech\n"
             + "• Contact: rooyssofttech2020@gmail.com\n"
-            + "• Version: 1.0.0\n\n"
+            + "• Version: 1.0.1\n\n"
             + "Install the attached APK to get started!";
 
     @Override
@@ -199,7 +199,7 @@ public class AboutActivity extends AppCompatActivity {
                 + "------------------------------\n"
                 + "Device: " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL + "\n"
                 + "Android: " + android.os.Build.VERSION.RELEASE + " (API " + android.os.Build.VERSION.SDK_INT + ")\n"
-                + "App Version: 1.0.0\n";
+                + "App Version: 1.0.1\n";
         intent.putExtra(Intent.EXTRA_TEXT, body);
         try {
             startActivity(Intent.createChooser(intent, "Send Email"));
