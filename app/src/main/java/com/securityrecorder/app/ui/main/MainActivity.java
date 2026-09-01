@@ -285,6 +285,13 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
     // --- Top Toolbar ---
 
     private void setupTopToolbar() {
+        boolean isHindi = com.securityrecorder.app.utils.LocaleHelper.isHindi(this);
+        binding.btnLanguageToggle.setText(isHindi ? "English" : "हिंदी");
+        binding.btnLanguageToggle.setOnClickListener(v -> {
+            String targetLang = com.securityrecorder.app.utils.LocaleHelper.isHindi(this) ? "en" : "hi";
+            com.securityrecorder.app.utils.LocaleHelper.setLocale(this, targetLang);
+        });
+
         updateToggleLayoutIcon(preferences.isGridLayout());
 
         binding.btnToggleSearch.setOnClickListener(v -> {

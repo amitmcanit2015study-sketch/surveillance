@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">सर्विलांस</string>
+    <string name="app_header_subtitle">द्वारा अमित भारत</string>
+    <string name="developer_name">अमित भारत</string>
+    <string name="developed_by_full">डेवलपर: अमित भारत</string>
+    <string name="company_name">रूयस सॉफ्ट टेक</string>
+    <string name="company_name_full">कंपनी: रूयस सॉफ्ट टेक</string>
+    <string name="company_email">rooyssofttech2020@gmail.com</string>
+    <string name="app_version_name">v1.0.0.2 (प्रोडक्शन बिल्ड)</string>
+    <string name="action_about">ऐप के बारे में</string>
+    <string name="about_description">सर्विलांस एक मुफ्त, विज्ञापन-रहित निगरानी और सुरक्षा रिकॉर्डिंग प्रबंधक है जो तेज़, सरल और सहज अनुभव के लिए बनाया गया है। साफ़ इंटरफ़ेस और पूर्ण गोपनीयता के साथ अपनी रिकॉर्डिंग कैप्चर और प्रबंधित करें।</string>
+    <string name="header_title">सर्विलांस</string>
+    <string name="share_app">साझा करें</string>
+    <string name="download_apk">डाउनलोड APK</string>
+    <string name="send_feedback">प्रतिक्रिया भेजें</string>
+    <string name="about_footer">100% ऑफलाइन • विज्ञापन-मुक्त • कोई ट्रैकिंग नहीं</string>
+    <string name="share_app_description">सर्विलांस ऐप दोस्तों और परिवार के साथ साझा करें</string>
+
+    <!-- Navigation and Menu -->
+    <string name="menu_toggle_grid">ग्रिड दृश्य</string>
+    <string name="menu_toggle_list">सूची दृश्य</string>
+    <string name="menu_storage">स्टोरेज प्रबंधक</string>
+    <string name="menu_settings">सेटिंग्स</string>
+    <string name="menu_search_hint">रिकॉर्डिंग खोजें (तारीख, नाम)...</string>
+    <string name="filter_all">सभी</string>
+    <string name="filter_today">आज</string>
+    <string name="filter_this_week">इस सप्ताह</string>
+    <string name="filter_this_month">इस महीने</string>
+    <string name="filter_favorites">पसंदीदा</string>
+
+    <!-- Empty State -->
+    <string name="empty_gallery_title">कोई रिकॉर्डिंग नहीं मिली</string>
+    <string name="empty_gallery_subtitle">सुरक्षा फुटेज कैप्चर करने के लिए नीचे दिए गए बटन पर टैप करें।</string>
+
+    <!-- Recording Controls & HUD -->
+    <string name="start_recording">रिकॉर्डिंग शुरू करें</string>
+    <string name="stop_recording">रिकॉर्डिंग रोकें</string>
+    <string name="recording_in_progress">रिकॉर्डिंग जारी है</string>
+    <string name="recording_stopped">रिकॉर्डिंग सहेजी गई</string>
+    <string name="storage_warning_title">कम स्टोरेज</string>
+    <string name="storage_critical_message">स्टोरेज बहुत कम है। सिस्टम सुरक्षा के लिए रिकॉर्डिंग स्वतः रोक दी गई।</string>
+    <string name="battery_warning">बैटरी कम है (%d%%)</string>
+    <string name="camera_flip">कैमरा बदलें</string>
+    <string name="torch_on">फ्लैश चालू</string>
+    <string name="torch_off">फ्लैश बंद</string>
+    <string name="quality_title">गुणवत्ता</string>
+    <string name="audio_enabled">ऑडियो सक्षम</string>
+    <string name="audio_disabled">ऑडियो अक्षम</string>
+    <string name="location_tagging">जीपीएस टैगिंग</string>
+
+    <!-- Video Player -->
+    <string name="player_title">रिकॉर्डिंग प्लेयर</string>
+    <string name="player_pip">पिक्चर-इन-पिक्चर</string>
+    <string name="player_metadata">जानकारी</string>
+    <string name="player_share">वीडियो साझा करें</string>
+    <string name="player_delete">वीडियो हटाएं</string>
+    <string name="player_rename">नाम बदलें</string>
+    <string name="playback_speed">चलाने की गति</string>
+
+    <!-- Settings -->
+    <string name="pref_resolution">वीडियो रिज़ॉल्यूशन</string>
+    <string name="pref_framerate">फ्रेम दर</string>
+    <string name="pref_max_duration">अधिकतम क्लिप अवधि</string>
+    <string name="pref_auto_cleanup">स्वतः क्लीनअप</string>
+    <string name="security_pin_title">सुरक्षा पिन</string>
+</resources>
