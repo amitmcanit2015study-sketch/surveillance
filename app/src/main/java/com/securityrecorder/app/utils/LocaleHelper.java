@@ -63,11 +63,6 @@ public class LocaleHelper {
             config.locale = locale;
         }
         res.updateConfiguration(config, res.getDisplayMetrics());
-
-        try {
-            LocaleListCompat appLocale = LocaleListCompat.forLanguageTags(lang);
-            AppCompatDelegate.setApplicationLocales(appLocale);
-        } catch (Exception ignored) {}
     }
 
     public static void setLocale(Activity activity, String languageTag) {
@@ -89,11 +84,6 @@ public class LocaleHelper {
         }
         res.updateConfiguration(config, res.getDisplayMetrics());
         activity.getApplicationContext().getResources().updateConfiguration(config, activity.getApplicationContext().getResources().getDisplayMetrics());
-
-        try {
-            LocaleListCompat appLocale = LocaleListCompat.forLanguageTags(languageTag);
-            AppCompatDelegate.setApplicationLocales(appLocale);
-        } catch (Exception ignored) {}
 
         activity.recreate();
     }
