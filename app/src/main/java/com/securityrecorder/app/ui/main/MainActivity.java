@@ -259,7 +259,9 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
         binding.tabHome.setVisibility(tabId == R.id.nav_home ? View.VISIBLE : View.GONE);
         binding.tabFiles.setVisibility(tabId == R.id.nav_files ? View.VISIBLE : View.GONE);
         binding.tabVault.setVisibility(tabId == R.id.nav_vault ? View.VISIBLE : View.GONE);
-        binding.tabSettings.setVisibility(tabId == R.id.nav_settings ? View.VISIBLE : View.GONE);
+        if (binding.tabSettings != null) {
+            binding.tabSettings.setVisibility(View.GONE);
+        }
 
         if (tabId == R.id.nav_home) {
             binding.layoutSearchBarContainer.setVisibility(View.GONE);
@@ -277,11 +279,6 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
             binding.btnToggleSearch.setVisibility(isVaultUnlocked ? View.VISIBLE : View.GONE);
             binding.btnToggleLayout.setVisibility(isVaultUnlocked ? View.VISIBLE : View.GONE);
             updateVaultUi();
-        } else if (tabId == R.id.nav_settings) {
-            binding.layoutSearchBarContainer.setVisibility(View.GONE);
-            binding.btnToggleSearch.setVisibility(View.GONE);
-            binding.btnToggleLayout.setVisibility(View.GONE);
-            updateSettingsUiValues();
         }
     }
 
