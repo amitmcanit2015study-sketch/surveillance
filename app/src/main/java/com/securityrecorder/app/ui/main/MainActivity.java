@@ -175,8 +175,14 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
             });
 
     @Override
+    protected void attachBaseContext(android.content.Context newBase) {
+        super.attachBaseContext(com.securityrecorder.app.utils.LocaleHelper.wrapContext(newBase));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        com.securityrecorder.app.utils.LocaleHelper.applyAppLanguage(this);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -285,13 +291,6 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
     // --- Top Toolbar ---
 
     private void setupTopToolbar() {
-        boolean isHindi = com.securityrecorder.app.utils.LocaleHelper.isHindi(this);
-        binding.btnLanguageToggle.setText(isHindi ? "English" : "हिंदी");
-        binding.btnLanguageToggle.setOnClickListener(v -> {
-            String targetLang = com.securityrecorder.app.utils.LocaleHelper.isHindi(this) ? "en" : "hi";
-            com.securityrecorder.app.utils.LocaleHelper.setLocale(this, targetLang);
-        });
-
         updateToggleLayoutIcon(preferences.isGridLayout());
 
         binding.btnToggleSearch.setOnClickListener(v -> {

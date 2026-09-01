@@ -105,6 +105,7 @@
     <string name="pref_dark_mode">Theme Mode</string>
     <string name="pref_backup_settings">Backup Settings</string>
     <string name="pref_restore_settings">Restore Settings</string>
+    <string name="security_pin_title">Security PIN</string>
 
     <!-- Auth -->
     <string name="auth_title">Security Authentication</string>
