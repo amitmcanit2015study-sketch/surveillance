@@ -25,13 +25,34 @@ public class AboutActivity extends AppCompatActivity {
             + "Install the attached APK to get started!";
 
     @Override
+    protected void attachBaseContext(android.content.Context newBase) {
+        super.attachBaseContext(com.securityrecorder.app.utils.LocaleHelper.wrapContext(newBase));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        com.securityrecorder.app.utils.LocaleHelper.applyAppLanguage(this);
         binding = ActivityAboutBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         setupToolbar();
+        setupLanguageToggle();
         setupActions();
+    }
+
+    private void setupLanguageToggle() {
+        boolean isHindi = com.securityrecorder.app.utils.LocaleHelper.isHindi(this);
+        binding.toggleLanguageGroup.check(isHindi ? com.securityrecorder.app.R.id.btnLangHindi : com.securityrecorder.app.R.id.btnLangEnglish);
+
+        binding.toggleLanguageGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                String targetLang = (checkedId == com.securityrecorder.app.R.id.btnLangHindi) ? "hi" : "en";
+                if (!targetLang.equals(com.securityrecorder.app.utils.LocaleHelper.getLanguage(this))) {
+                    com.securityrecorder.app.utils.LocaleHelper.setLocale(this, targetLang);
+                }
+            }
+        });
     }
 
     private void setupToolbar() {

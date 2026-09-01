@@ -5,61 +5,54 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_splash_gradient">
 
-    <!-- Center Brand Container -->
-    <LinearLayout
-        android:id="@+id/layoutCenterBrand"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <ImageView
+        android:id="@+id/ivSplashLogo"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/ic_splash_surveillance"
+        android:contentDescription="@string/app_name"
+        app:layout_constraintBottom_toTopOf="@+id/tvSplashTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
-        <ImageView
-            android:id="@+id/ivSplashLogo"
-            android:layout_width="92dp"
-            android:layout_height="92dp"
-            android:src="@drawable/ic_splash_surveillance"
-            android:contentDescription="@string/app_name" />
+    <TextView
+        android:id="@+id/tvSplashTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/app_name"
+        android:textColor="#FFFFFF"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/tvSplashSubtitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ivSplashLogo" />
 
-        <TextView
-            android:id="@+id/tvSplashTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:fontFamily="sans-serif-medium"
-            android:text="Surveillance"
-            android:textColor="#FFFBEB"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:letterSpacing="0.02" />
+    <TextView
+        android:id="@+id/tvSplashSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Stealth Recorder &amp; Secure Vault"
+        android:textColor="#CCFFFFFF"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/tvSplashDeveloper"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvSplashTitle" />
 
-        <TextView
-            android:id="@+id/tvSplashSubtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:fontFamily="sans-serif"
-            android:text="Stealth Recorder &amp; Secure Vault"
-            android:textColor="#E2E8F0"
-            android:textSize="15sp"
-            android:alpha="0.9" />
-
-    </LinearLayout>
-
-    <!-- Bottom Developer Credit -->
     <TextView
         android:id="@+id/tvSplashDeveloper"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="36dp"
-        android:fontFamily="sans-serif-medium"
-        android:text="Developed by Amit Bharat"
-        android:textColor="#F8FAFC"
+        android:text="@string/developed_by"
+        android:textColor="#CCFFFFFF"
         android:textSize="14sp"
-        android:letterSpacing="0.01"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
