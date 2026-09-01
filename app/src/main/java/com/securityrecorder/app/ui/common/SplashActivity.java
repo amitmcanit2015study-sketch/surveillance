@@ -44,7 +44,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void animateContent() {
-        View brandView = findViewById(R.id.layoutCenterBrand);
+        View brandView = findViewById(R.id.ivSplashLogo);
         View developerView = findViewById(R.id.tvSplashDeveloper);
 
         if (brandView != null) {
