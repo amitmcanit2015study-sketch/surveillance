@@ -73,7 +73,7 @@
         <!-- Main Gallery Home Screen -->
         <activity
             android:name=".ui.main.MainActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:configChanges="locale|layoutDirection|orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="true"
             android:launchMode="singleTop"
             android:supportsPictureInPicture="true"
@@ -130,6 +130,7 @@
         <activity
             android:name=".ui.common.AboutActivity"
             android:exported="false"
+            android:configChanges="locale|layoutDirection|orientation|screenSize"
             android:theme="@style/Theme.GallerySecurityRecorder" />
 
         <!-- FileProvider for Sharing Recorded Videos Safely -->

@@ -182,7 +182,6 @@ public class MainActivity extends AppCompatActivity implements VideoAdapter.OnVi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        com.securityrecorder.app.utils.LocaleHelper.applyAppLanguage(this);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
