@@ -122,8 +122,8 @@ public class CameraRecorderActivity extends AppCompatActivity {
         binding.btnQualityToggle.setText(currentResolution.toUpperCase());
         updateAudioButtonUi();
 
-        // Viewfinder preview is visible by default
-        updatePreviewVisibility(true);
+        // Discrete Text-Only Mode (No video preview on screen)
+        updatePreviewVisibility(false);
 
         binding.btnBack.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
@@ -132,6 +132,10 @@ public class CameraRecorderActivity extends AppCompatActivity {
 
         binding.btnTogglePreview.setOnClickListener(v -> {
             HapticUtils.performClickFeedback(this);
+            if (activeRecording != null) {
+                Toast.makeText(this, "Video preview is disabled while recording", Toast.LENGTH_SHORT).show();
+                return;
+            }
             updatePreviewVisibility(!isPreviewVisible);
         });
 
@@ -359,6 +363,13 @@ public class CameraRecorderActivity extends AppCompatActivity {
         viewModel.getFormattedDuration().observe(this, duration -> {
             binding.tvRecordingDuration.setText(duration);
             binding.tvDiscreteTimer.setText(duration);
+            if (activeRecording != null) {
+                android.app.NotificationManager nm = (android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                if (nm != null) {
+                    nm.notify(com.securityrecorder.app.utils.NotificationHelper.NOTIFICATION_ID_RECORDING,
+                            com.securityrecorder.app.utils.NotificationHelper.buildRecordingNotification(this, duration));
+                }
+            }
         });
 
         viewModel.getBatteryLevel().observe(this, batteryPct -> {
@@ -482,9 +493,20 @@ public class CameraRecorderActivity extends AppCompatActivity {
 
             activeRecording = pendingRecording.start(ContextCompat.getMainExecutor(CameraRecorderActivity.this), event -> {
                 if (event instanceof VideoRecordEvent.Start) {
+                    updatePreviewVisibility(false);
                     viewModel.startRecordingSession(currentOutputFile);
+                    android.app.NotificationManager nm = (android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    if (nm != null) {
+                        com.securityrecorder.app.utils.NotificationHelper.createNotificationChannels(this);
+                        nm.notify(com.securityrecorder.app.utils.NotificationHelper.NOTIFICATION_ID_RECORDING,
+                                com.securityrecorder.app.utils.NotificationHelper.buildRecordingNotification(this, "00:00:00"));
+                    }
                 } else if (event instanceof VideoRecordEvent.Finalize) {
                     VideoRecordEvent.Finalize finalizeEvent = (VideoRecordEvent.Finalize) event;
+                    android.app.NotificationManager nm = (android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    if (nm != null) {
+                        nm.cancel(com.securityrecorder.app.utils.NotificationHelper.NOTIFICATION_ID_RECORDING);
+                    }
                     String locationStr = "Unknown";
                     if (preferences.isLocationEnabled()) {
                         Location loc = LocationHelper.getLastKnownLocation(CameraRecorderActivity.this);
@@ -511,21 +533,25 @@ public class CameraRecorderActivity extends AppCompatActivity {
             activeRecording.stop();
             activeRecording = null;
             viewModel.stopRecordingSession();
+            android.app.NotificationManager nm = (android.app.NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (nm != null) {
+                nm.cancel(com.securityrecorder.app.utils.NotificationHelper.NOTIFICATION_ID_RECORDING);
+            }
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent != null && com.securityrecorder.app.utils.NotificationHelper.ACTION_STOP_RECORDING.equals(intent.getAction())) {
+            stopRecording();
         }
     }
 
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
-        if (activeRecording != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            try {
-                android.util.Rational aspectRatio = new android.util.Rational(9, 16);
-                android.app.PictureInPictureParams params = new android.app.PictureInPictureParams.Builder()
-                        .setAspectRatio(aspectRatio)
-                        .build();
-                enterPictureInPictureMode(params);
-            } catch (Exception ignored) {}
-        }
+        // Do not enter picture-in-picture video preview while recording
     }
 
     @Override

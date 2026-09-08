@@ -21,7 +21,7 @@ import com.securityrecorder.app.ui.main.MainActivity;
 @SuppressLint("CustomSplashScreen")
 public class SplashActivity extends AppCompatActivity {
 
-    private static final long SPLASH_DURATION_MS = 1500L;
+    private static final long SPLASH_DURATION_MS = 400L;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private boolean isNavigated = false;
 

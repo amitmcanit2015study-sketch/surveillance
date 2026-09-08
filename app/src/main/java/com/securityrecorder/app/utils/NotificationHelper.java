@@ -60,7 +60,7 @@ public class NotificationHelper {
     }
 
     public static Notification buildRecordingNotification(Context context, String durationText) {
-        Intent openIntent = new Intent(context, MainActivity.class);
+        Intent openIntent = new Intent(context, com.securityrecorder.app.ui.recorder.CameraRecorderActivity.class);
         openIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent openPendingIntent = PendingIntent.getActivity(
                 context,
@@ -69,7 +69,7 @@ public class NotificationHelper {
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
         );
 
-        Intent stopIntent = new Intent(context, MainActivity.class);
+        Intent stopIntent = new Intent(context, com.securityrecorder.app.ui.recorder.CameraRecorderActivity.class);
         stopIntent.setAction(ACTION_STOP_RECORDING);
         stopIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent stopPendingIntent = PendingIntent.getActivity(
